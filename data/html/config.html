@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuração do Sistema</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="brand">
+            <div class="brand-main">
+                <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                <h2 class="brand-company">Infitech - Automação</h2>
+            </div>
+            <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+        </div>
+        <h1>Configuração do Sistema</h1>
+        
+        <form method="post" action="/config_mode_save">
+            <!-- Modbus Mode Selection -->
+            <div class="config-block">
+                <h3>Modo Modbus</h3>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="modbus_mode" value="rtu" {{RTU_CHECKED}}> RTU
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="modbus_mode" value="tcp" {{TCP_CHECKED}}> TCP
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="modbus_mode" value="ap" {{AP_CHECKED}}> Access Point
+                    </label>
+                </div>
+            </div>
+
+            <div id="rtu_block" class="config-block" style="display:{{RTU_DISPLAY}};">
+                <h3>Configuração RTU</h3>
+                <div class="form-group">
+                    <label>Baud Rate:</label>
+                    <select name="rtu_baud">
+                        <option value="9600" {{SEL9600}}>9600</option>
+                        <option value="19200" {{SEL19200}}>19200</option>
+                        <option value="38400" {{SEL38400}}>38400</option>
+                        <option value="57600" {{SEL57600}}>57600</option>
+                        <option value="115200" {{SEL115200}}>115200</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Paridade:</label>
+                    <select name="rtu_parity">
+                        <option value="0" {{SP0}}>Nenhuma</option>
+                        <option value="1" {{SP1}}>Par</option>
+                        <option value="2" {{SP2}}>Ímpar</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Endereço Slave:</label>
+                    <input type="number" name="rtu_addr" value="{{ENDERECO}}" min="1" max="247">
+                </div>
+            </div>
+
+            <!-- TCP Configuration -->
+            <div id="tcp_block" class="config-block" style="display:{{TCP_DISPLAY}};">
+                <h3>Configuração TCP</h3>
+                <div class="form-group">
+                    <label>IP:</label>
+                    <input type="text" name="tcp_ip" value="{{TCP_IP}}" placeholder="192.168.1.100">
+                </div>
+                <div class="form-group">
+                    <label>Gateway:</label>
+                    <input type="text" name="tcp_gateway" value="{{TCP_GATEWAY}}" placeholder="192.168.1.1">
+                </div>
+                <div class="form-group">
+                    <label>Porta:</label>
+                    <input type="number" name="tcp_port" value="{{TCP_PORT}}" min="1" max="65535">
+                </div>
+                <div class="form-group">
+                    <label>Unit ID:</label>
+                    <input type="number" name="tcp_unit" value="{{TCP_UNIT}}" min="1" max="247">
+                </div>
+                <div class="form-group">
+                    <label>Timeout (ms):</label>
+                    <input type="number" name="tcp_timeout" value="{{TCP_TIMEOUT}}" min="100" max="10000">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="tcp_enabled" {{TCP_EN_STR}}> Habilitar TCP
+                    </label>
+                </div>
+            </div>
+
+            <!-- Access Point Configuration -->
+            <div id="ap_block" class="config-block" style="display:{{AP_DISPLAY}};">
+                <h3>Configuração Access Point</h3>
+                <div class="form-group">
+                    <label>SSID do AP:</label>
+                    <input type="text" name="ap_ssid" value="{{AP_SSID}}" placeholder="Nome do AP">
+                </div>
+                <div class="form-group">
+                    <label>Usuário:</label>
+                    <input type="text" name="ap_username" value="{{AP_USERNAME}}" placeholder="Usuário">
+                </div>
+                <div class="form-group">
+                    <label>Senha:</label>
+                    <input type="password" name="ap_password" value="{{AP_PASSWORD}}" placeholder="Senha">
+                </div>
+                <div class="form-group">
+                    <label>IP do AP:</label>
+                    <input type="text" name="ap_ip" value="{{AP_IP}}" placeholder="192.168.4.1">
+                </div>
+            </div>
+
+            <!-- WiFi Configuration -->
+            <div id="wifi_block" class="config-block" style="display:{{WIFI_DISPLAY}};">
+                <h3>Redes WiFi Disponíveis</h3>
+                <p>Clique em 'Atualizar Lista de Redes' para ver as redes disponíveis.</p>
+                <div class="form-actions">
+                    <button class="btn btn-success" type="button" onclick="location.reload();">Atualizar Lista de Redes</button>
+                </div>
+                
+                <div class="wifi-networks">
+                    {{WIFI_NETWORKS}}
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-success" type="button" onclick="startWifiScan()">Configuração Manual da Rede</button>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Salvar</button>
+                <a class="btn btn-danger" href="/">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="/js/scripts.js"></script>
+    <script>
+        function updateVisibility() {
+            var r = document.querySelector('input[name="modbus_mode"]:checked');
+            var mode = r ? r.value : 'rtu';
+            document.getElementById('rtu_block').style.display = (mode === 'rtu') ? 'block' : 'none';
+            document.getElementById('tcp_block').style.display = (mode === 'tcp') ? 'block' : 'none';
+            document.getElementById('ap_block').style.display = (mode === 'ap') ? 'block' : 'none';
+            document.getElementById('wifi_block').style.display = (mode === 'tcp') ? 'block' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var radios = document.querySelectorAll('input[name="modbus_mode"]');
+            for (var i = 0; i < radios.length; i++) {
+                radios[i].addEventListener('change', updateVisibility);
+            }
+            updateVisibility();
+        });
+
+        var selectedSSID = '';
+        
+        function selectWifi(ssid) {
+            selectedSSID = ssid;
+        }
+        
+        function startScan() {
+            fetch('/wifi_scan').then(function() {
+                setTimeout(function() { location.reload(); }, 2500);
+            });
+        }
+        
+        function saveWifiConfig() {
+            var ssid = selectedSSID;
+            var pass = document.getElementById('wifi_pass').value;
+            if (!ssid) { alert('Selecione uma rede'); return; }
+            if (!pass) { alert('Digite a senha'); return; }
+            var body = 'ssid=' + encodeURIComponent(ssid) + '&password=' + encodeURIComponent(pass);
+            fetch('/wifi_save_nvs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body
+            })
+            .then(function(resp) { return resp.text(); })
+            .then(function(txt) { alert('WiFi salvo: ' + txt); })
+            .catch(function(e) { alert('Erro: ' + e); });
+        }
+        
+        function saveAPConfig(event) {
+            event.preventDefault();
+            var ssid = document.getElementById('ap_ssid').value;
+            var username = document.getElementById('ap_username').value;
+            var password = document.getElementById('ap_password').value;
+            var ip = document.getElementById('ap_ip').value;
+            var body = 'ap_ssid=' + encodeURIComponent(ssid) + 
+                      '&ap_username=' + encodeURIComponent(username) + 
+                      '&ap_password=' + encodeURIComponent(password) + 
+                      '&ap_ip=' + encodeURIComponent(ip);
+            fetch('/ap_save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body
+            })
+            .then(function(resp) { return resp.text(); })
+            .then(function(txt) { alert('Configuração AP salva: ' + txt); })
+            .catch(function(e) { alert('Erro ao salvar AP: ' + e); });
+        }
+    </script>
+</body>
+</html>

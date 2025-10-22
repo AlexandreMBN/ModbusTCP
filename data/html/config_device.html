@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuração de Comunicação - Medidor de Combustão</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div>
+        <div>
+            <!-- <h1>🔧 Configuração de Comunicação</h1> -->
+            <a href="/admin">⬅️ Voltar</a>
+        <div>
+            <div class="brand">
+                <div class="brand-main">
+                    <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                    <h2 class="brand-company">Infitech - Automação</h2>
+                </div>
+                <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+            </div>
+            <h1>⚙️ Configuração do Dispositivo</h1>
+        
+            <div>
+            <div class="config-card">
+                <h2>⚙️ Modo de Operação</h2>
+                <p class="mode-description">Selecione o modo de funcionamento do dispositivo:</p>
+                
+                <div class="mode-options">
+                    <div class="mode-option">
+                        <input type="radio" id="mode_ap" name="operation_mode" value="ap" checked>
+                        <label for="mode_ap">
+                            <span class="mode-icon">📡</span>
+                            <div class="mode-info">
+                                <strong>Modo AP (Access Point)</strong>
+                                <small>Dispositivo cria sua própria rede WiFi</small>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="mode-option">
+                        <input type="radio" id="mode_rtu" name="operation_mode" value="rtu">
+                        <label for="mode_rtu">
+                            <span class="mode-icon">🔌</span>
+                            <div class="mode-info">
+                                <strong>Modo RTU</strong>
+                                <small>Comunicação serial Modbus RTU</small>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="mode-option">
+                        <input type="radio" id="mode_tcp" name="operation_mode" value="tcp">
+                        <label for="mode_tcp">
+                            <span class="mode-icon">🌐</span>
+                            <div class="mode-info">
+                                <strong>STA/Modo TCP</strong>
+                                <small>Comunicação TCP/IP Modbus</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="config-container">
+            <!-- Card: Configuração do Access Point -->
+            <div id="ap-section" class="config-card config-section">
+                <h2>📡 Configuração do Access Point (AP)</h2>
+                
+                <form class="config-form" action="/ap_config_save" method="post" enctype="application/x-www-form-urlencoded">
+                    <div class="config-form-group">
+                        <label class="config-label">Nome do Dispositivo (SSID do AP):</label>
+                        <input class="config-input" type="text" name="ap_ssid" value="{{AP_SSID}}" maxlength="31" required 
+                               placeholder="Ex: ESP32_Medidor_001">
+                        <small class="config-help">Este será o nome da rede WiFi quando o dispositivo estiver em modo AP</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="config-label">Senha do AP:</label>
+                        <div class="password-input-container">
+                            <input class="config-input" type="password" id="ap_password" name="ap_password" value="{{AP_PASSWORD}}" minlength="8" maxlength="63" required 
+                                   placeholder="Mínimo 8 caracteres">
+                            <button type="button" class="password-toggle-btn" onclick="togglePassword('ap_password')" aria-label="Mostrar/ocultar senha">
+                                <span class="password-toggle-icon" id="ap_password_icon">👁️</span>
+                            </button>
+                        </div>
+                        <small class="config-help">Senha para conectar ao dispositivo quando em modo AP</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="config-label">Confirmar Senha do AP:</label>
+                        <div class="password-input-container">
+                            <input class="config-input" type="password" id="ap_password_confirm" name="ap_password_confirm" minlength="8" maxlength="63" required 
+                                   placeholder="Digite novamente a senha">
+                            <button type="button" class="password-toggle-btn" onclick="togglePassword('ap_password_confirm')" aria-label="Mostrar/ocultar senha">
+                                <span class="password-toggle-icon" id="ap_password_confirm_icon">👁️</span>
+                            </button>
+                        </div>
+                        <small class="config-help">Repita a senha para confirmação</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="config-label">IP Padrão do Dispositivo:</label>
+                        <input class="config-input" type="text" name="ap_ip" value="{{AP_IP}}" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" required 
+                               placeholder="Ex: 192.168.4.1">
+                        <small class="config-help">IP que o dispositivo terá quando estiver em modo AP</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="btn-config btn-primary" type="submit">💾 Salvar Configurações do AP</button>
+                    </div>
+                </form>
+                
+                <div class="info-box">
+                    <h4>⚠️ Importante</h4>
+                    <p>Após salvar as configurações, o dispositivo será reiniciado automaticamente para aplicar as mudanças. 
+                       As novas configurações serão utilizadas na próxima vez que o dispositivo entrar em modo AP.</p>
+                </div>
+                
+            </div>
+
+            <!-- Card: Configuração Modbus RTU -->
+            <div id="rtu-section" class="config-card config-section" style="display: none;">
+                <h2>🔌 Configuração Modbus RTU</h2>
+                
+                <form class="config-form" action="/rtu_config_save" method="post" enctype="application/x-www-form-urlencoded">
+                    <div class="config-form-group">
+                        <label class="config-label">Baudrate:</label>
+                        <select class="config-input" name="rtu_baudrate" id="rtu_baudrate" required>
+                            <option value="9600">9600</option>
+                            <option value="19200">19200</option>
+                            <option value="38400">38400</option>
+                            <option value="57600">57600</option>
+                            <option value="115200">115200</option>
+                        </select>
+                        <small class="config-help">Taxa de transmissão de dados em bits por segundo</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="config-label">Bits de Dados:</label>
+                        <select class="config-input" name="rtu_databits" id="rtu_databits" required>
+                            <option value="7">7 bits</option>
+                            <option value="8">8 bits</option>
+                        </select>
+                        <small class="config-help">Número de bits de dados por frame</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="config-label">Paridade:</label>
+                        <select class="config-input" name="rtu_parity" id="rtu_parity" required>
+                            <option value="none">Nenhuma</option>
+                            <option value="even">Par</option>
+                            <option value="odd">Ímpar</option>
+                        </select>
+                        <small class="config-help">Tipo de verificação de paridade</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="config-label">Stop Bits:</label>
+                        <select class="config-input" name="rtu_stopbits" id="rtu_stopbits" required>
+                            <option value="1">1 bit</option>
+                            <option value="2">2 bits</option>
+                        </select>
+                        <small class="config-help">Número de bits de parada</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="config-label">Endereço Slave:</label>
+                        <input class="config-input" type="number" name="rtu_slave_address" id="rtu_slave_address" value="{{RTU_SLAVE_ADDRESS}}" min="1" max="247" required 
+                               placeholder="1-247">
+                        <small class="config-help">Endereço do dispositivo na rede Modbus (1-247)</small>
+                    </div>
+                    
+                    <div class="config-form-group">
+                        <label class="config-label">Timeout (ms):</label>
+                        <input class="config-input" type="number" name="rtu_timeout" id="rtu_timeout" value="{{RTU_TIMEOUT}}" min="100" max="10000" required 
+                               placeholder="1000">
+                        <small class="config-help">Tempo limite para resposta em milissegundos</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="btn-config btn-primary" type="submit">💾 Salvar Configurações RTU</button>
+                    </div>
+                </form>
+                
+                <div class="info-box">
+                    <h4>⚠️ Importante</h4>
+                    <p>Configure os parâmetros de acordo com o master Modbus. 
+                       Certifique-se de que todos os dispositivos na rede tenham o mesmo baudrate, paridade e stop bits.</p>
+                </div>
+                
+            </div>
+
+            <!-- Card: Scan de Redes WiFi -->
+            <div id="tcp-section" class="config-card config-section" style="display: none;">
+                <h2>📶 Redes WiFi Disponíveis</h2>
+                
+                <div class="wifi-scan-section">
+                    <div id="wifi-scan-status" class="scan-status">
+                        <p>🔍 Clique no botão abaixo para escanear redes WiFi disponíveis</p>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button id="btn-scan-wifi" class="btn-config btn-secondary" type="button" onclick="startWifiScan()">
+                            🔄 Escanear Redes WiFi
+                        </button>
+                    </div>
+                    
+                    <div id="wifi-networks-list" class="wifi-networks" style="display: none;">
+                        <h3>Redes Encontradas:</h3>
+                        <div id="networks-container" class="networks-grid">
+                            <!-- Redes serão carregadas aqui via JavaScript -->
+                        </div>
+                        
+                        <!-- Formulário de Configuração WiFi -->
+                        <div class="wifi-connection-form">
+                            <h3>🔗 Configurar Conexão WiFi</h3>
+                            <p class="connection-help">Clique em uma rede acima para selecioná-la automaticamente.</p>
+                            
+                            <form id="wifi-config-form" class="config-form" action="/wifi_config_save" method="post" enctype="application/x-www-form-urlencoded">
+                                <div class="config-form-group">
+                                    <label class="config-label">SSID da Rede:</label>
+                                    <input class="config-input" type="text" id="wifi_ssid" name="wifi_ssid" 
+                                           placeholder="Selecione uma rede acima ou digite manualmente" required readonly>
+                                    <small class="config-help">Nome da rede WiFi selecionada</small>
+                                </div>
+                                
+                                <div class="config-form-group">
+                                    <label class="config-label">Senha da Rede:</label>
+                                    <div class="password-input-container">
+                                        <input class="config-input" type="password" id="wifi_password" name="wifi_password" 
+                                               placeholder="Digite a senha da rede WiFi">
+                                        <button type="button" class="password-toggle-btn" onclick="togglePassword('wifi_password')" aria-label="Mostrar/ocultar senha">
+                                            <span class="password-toggle-icon" id="wifi_password_icon">👁️</span>
+                                        </button>
+                                    </div>
+                                    <small class="config-help">Deixe em branco para redes abertas</small>
+                                </div>
+
+                                <div class="config-form-group">
+                                    <label class="config-label">IP (manual, opcional)</label>
+                                    <input class="config-input" type="text" id="wifi_ip" name="wifi_ip" placeholder="Ex: 192.168.1.50">
+                                    <small class="config-help">Deixe em branco para usar DHCP</small>
+                                </div>
+
+                                <div class="config-form-group">
+                                    <label class="config-label">Máscara de Rede</label>
+                                    <input class="config-input" type="text" id="wifi_mask" name="wifi_mask" placeholder="Ex: 255.255.255.0">
+                                </div>
+
+                                <div class="config-form-group">
+                                    <label class="config-label">Gateway</label>
+                                    <input class="config-input" type="text" id="wifi_gateway" name="wifi_gateway" placeholder="Ex: 192.168.1.1">
+                                </div>
+
+                                <div class="config-form-group">
+                                    <label class="config-label">DNS</label>
+                                    <input class="config-input" type="text" id="wifi_dns" name="wifi_dns" placeholder="Ex: 8.8.8.8">
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button id="btn-save-connect" class="btn-config btn-primary" type="button" onclick="saveAndConnect()">
+                                        💾🔌 Salvar e Conectar
+                                    </button>
+                                    <button class="btn-config btn-secondary" type="button" onclick="clearWifiForm()">
+                                        🗑️ Limpar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h4>💡 Informação</h4>
+                    <p>Use esta seção para verificar quais redes WiFi estão disponíveis no local. 
+                       As redes são ordenadas por intensidade de sinal (RSSI) do mais forte para o mais fraco.</p>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button onclick="doFactoryReset()">
+                    🗂️ Reset de Fábrica
+            </button>
+        </div>
+    </div>
+    
+    <script src="/js/scripts.js"></script>
+    <script>
+        // Validação de confirmação de senha
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[action="/ap_config_save"]');
+            const password = document.getElementById('ap_password');
+            const confirmPassword = document.getElementById('ap_password_confirm');
+            
+            function validatePasswords() {
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity('As senhas não coincidem');
+                    confirmPassword.style.borderColor = '#e53e3e';
+                } else {
+                    confirmPassword.setCustomValidity('');
+                    confirmPassword.style.borderColor = '#cbd5e0';
+                }
+            }
+            
+            password.addEventListener('input', validatePasswords);
+            confirmPassword.addEventListener('input', validatePasswords);
+            
+            form.addEventListener('submit', function(e) {
+                if (password.value !== confirmPassword.value) {
+                    e.preventDefault();
+                    alert('As senhas não coincidem. Por favor, verifique e tente novamente.');
+                    confirmPassword.focus();
+                }
+            });
+        });
+
+        // Funções para scan WiFi
+        window.startWifiScan = function() {
+            const scanStatus = document.getElementById('wifi-scan-status');
+            const btnScan = document.getElementById('btn-scan-wifi');
+            const networksList = document.getElementById('wifi-networks-list');
+            
+            // Atualizar interface
+            scanStatus.innerHTML = '<p>🔄 Escaneando redes WiFi... Por favor aguarde.</p>';
+            btnScan.disabled = true;
+            btnScan.textContent = '⏳ Escaneando...';
+            networksList.style.display = 'none';
+            
+            // Iniciar scan no backend
+            fetch('/wifi-scan-trigger', { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        // Aguardar 3 segundos e buscar resultados
+                        setTimeout(loadWifiNetworks, 3000);
+                    } else {
+                        throw new Error('Erro ao iniciar scan');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao iniciar scan:', error);
+                    scanStatus.innerHTML = '<p>❌ Erro ao iniciar scan. <button onclick="startWifiScan()" class="btn-config btn-secondary">Tentar novamente</button></p>';
+                    resetScanButton();
+                });
+        };
+
+        window.loadWifiNetworks = function() {
+            fetch('/wifi-scan-data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.networks && data.networks.length > 0) {
+                        displayWifiNetworks(data.networks);
+                    } else {
+                        document.getElementById('wifi-scan-status').innerHTML = 
+                            '<p>📡 Nenhuma rede encontrada. <button onclick="startWifiScan()" class="btn-config btn-secondary">Escanear novamente</button></p>';
+                    }
+                    resetScanButton();
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar redes:', error);
+                    document.getElementById('wifi-scan-status').innerHTML = 
+                        '<p>❌ Erro ao carregar resultados. <button onclick="startWifiScan()" class="btn-config btn-secondary">Tentar novamente</button></p>';
+                    resetScanButton();
+                });
+        };
+
+        window.displayWifiNetworks = function(networks) {
+            const container = document.getElementById('networks-container');
+            const scanStatus = document.getElementById('wifi-scan-status');
+            const networksList = document.getElementById('wifi-networks-list');
+            
+            // Limpar container
+            container.innerHTML = '';
+            
+            // Ordenar por RSSI (sinal mais forte primeiro)
+            networks.sort((a, b) => b.rssi - a.rssi);
+            
+            // Criar cards para cada rede
+            networks.forEach(network => {
+                const networkCard = document.createElement('div');
+                networkCard.className = 'network-card';
+                
+                // Adicionar evento de clique para seleção (passa o event)
+                networkCard.onclick = function(e) {
+                    selectWifiNetwork(network, e);
+                };
+                
+                // Determinar ícone de segurança
+                const securityIcon = network.authmode === 'OPEN' ? '🔓' : '🔒';
+                const securityText = network.authmode === 'OPEN' ? 'Aberta' : 'Protegida';
+                
+                // Determinar força do sinal
+                let signalIcon = '📶';
+                let signalClass = 'signal-strong';
+                if (network.rssi < -70) {
+                    signalIcon = '📶';
+                    signalClass = 'signal-weak';
+                } else if (network.rssi < -50) {
+                    signalIcon = '📶';
+                    signalClass = 'signal-medium';
+                }
+                
+                networkCard.innerHTML = `
+                    <div class="network-info">
+                        <div class="network-name">${network.ssid}</div>
+                        <div class="network-details">
+                            <span class="signal ${signalClass}">${signalIcon} ${network.rssi} dBm</span>
+                            <span class="security">${securityIcon} ${securityText}</span>
+                            <span class="channel">📡 Canal ${network.primary}</span>
+                        </div>
+                    </div>
+                    <div class="selection-indicator">👆 Clique para selecionar</div>
+                `;
+                
+                container.appendChild(networkCard);
+            });
+            
+            // Mostrar lista e atualizar status
+            scanStatus.innerHTML = `<p>✅ Scan concluído! Encontradas ${networks.length} redes:</p>`;
+            networksList.style.display = 'block';
+        };
+
+        window.resetScanButton = function() {
+            const btnScan = document.getElementById('btn-scan-wifi');
+            btnScan.disabled = false;
+            btnScan.textContent = '🔄 Escanear Redes WiFi';
+        };
+
+        // Função para selecionar uma rede WiFi
+        window.selectWifiNetwork = function(network, e) {
+            // Remover seleção anterior
+            document.querySelectorAll('.network-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Adicionar seleção à rede clicada
+            if (e && e.currentTarget) {
+                e.currentTarget.classList.add('selected');
+            }
+            
+            // Preencher campos do formulário
+            const ssidInput = document.getElementById('wifi_ssid');
+            const passwordInput = document.getElementById('wifi_password');
+            const passwordToggleBtn = document.querySelector('#wifi_password').parentElement.querySelector('.password-toggle-btn');
+            const passwordIcon = document.getElementById('wifi_password_icon');
+
+            ssidInput.value = network.ssid;
+
+            // Limpar senha anterior e resetar estado do input (tipo e ícone)
+            passwordInput.value = '';
+            passwordInput.type = 'password';
+            if (passwordIcon) passwordIcon.textContent = '👁️';
+
+            // Se a rede é aberta, desabilitar campo de senha e esconder/desabilitar o toggle
+            if (network.authmode === 'OPEN') {
+                passwordInput.disabled = true;
+                passwordInput.placeholder = 'Rede aberta - não precisa de senha';
+                if (passwordToggleBtn) {
+                    passwordToggleBtn.disabled = true;
+                    passwordToggleBtn.style.opacity = '0.5';
+                }
+            } else {
+                passwordInput.disabled = false;
+                passwordInput.placeholder = 'Digite a senha da rede WiFi';
+                if (passwordToggleBtn) {
+                    passwordToggleBtn.disabled = false;
+                    passwordToggleBtn.style.opacity = '1';
+                }
+                passwordInput.focus();
+            }
+            
+            // Rolar para o formulário
+            document.querySelector('.wifi-connection-form').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        };
+
+        // Função para limpar o formulário WiFi
+        window.clearWifiForm = function() {
+            document.getElementById('wifi_ssid').value = '';
+            document.getElementById('wifi_password').value = '';
+            document.getElementById('wifi_password').disabled = false;
+            document.getElementById('wifi_password').placeholder = 'Digite a senha da rede WiFi';
+            // Reset password input type and toggle button state/icon
+            const passwordInput = document.getElementById('wifi_password');
+            if (passwordInput) {
+                passwordInput.type = 'password';
+                const pwToggle = passwordInput.parentElement.querySelector('.password-toggle-btn');
+                const pwIcon = document.getElementById('wifi_password_icon');
+                if (pwToggle) {
+                    pwToggle.disabled = false;
+                    pwToggle.style.opacity = '1';
+                }
+                if (pwIcon) pwIcon.textContent = '👁️';
+            }
+            
+            // Remover todas as seleções
+            document.querySelectorAll('.network-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        };
+
+        // Função para conectar à rede
+        window.connectToWifi = function() {
+            const ssid = document.getElementById('wifi_ssid').value;
+            const password = document.getElementById('wifi_password').value;
+            
+            if (!ssid) {
+                alert('Por favor, selecione uma rede WiFi primeiro.');
+                return;
+            }
+            
+            if (confirm(`Conectar à rede WiFi?\nSSID: ${ssid}\n\nO ESP32 irá reiniciar e voltar em modo dual (AP + STA).\nVocê poderá acessar tanto pelo AP quanto pela nova rede.`)) {
+                const connectBtn = document.getElementById('btn-save-connect') || document.querySelector('button[onclick="connectToWifi()"]');
+                if (connectBtn) {
+                    connectBtn.disabled = true;
+                    connectBtn.textContent = '⏳ Conectando...';
+                }
+                
+                fetch('/wifi_connect', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ssid: ssid,
+                        password: password
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const ipMsg = data.ip ? ('\nIP previsto após reinício: ' + data.ip) : '';
+                        alert('✅ ' + data.message + ipMsg + '\n\nO ESP32 reiniciará em alguns segundos e voltará em modo dual.\nVocê poderá acessar tanto pelo AP quanto pela nova rede WiFi.');
+                    } else {
+                        throw new Error(data.error || 'Erro desconhecido');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao conectar:', error);
+                    alert('❌ Erro ao conectar à rede: ' + error.message);
+                })
+                .finally(() => {
+                    if (connectBtn) {
+                        connectBtn.disabled = false;
+                        connectBtn.textContent = '🔌 Conectar à Rede';
+                    }
+                });
+            }
+        };
+
+        // Validação e envio do formulário WiFi
+        document.addEventListener('DOMContentLoaded', function() {
+            const wifiForm = document.getElementById('wifi-config-form');
+            
+            if (wifiForm) {
+                wifiForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const ssid = document.getElementById('wifi_ssid').value.trim();
+                    const password = document.getElementById('wifi_password').value;
+                    
+                    if (!ssid) {
+                        alert('Por favor, selecione ou digite o SSID da rede WiFi.');
+                        return;
+                    }
+                    
+                    if (confirm(`Salvar configurações WiFi?\nSSID: ${ssid}\nSenha: ${password ? '***' : '(sem senha)'}`)) {
+                        // Criar dados do formulário
+                        const ip = document.getElementById('wifi_ip').value.trim();
+                        const mask = document.getElementById('wifi_mask').value.trim();
+                        const gateway = document.getElementById('wifi_gateway').value.trim();
+                        const dns = document.getElementById('wifi_dns').value.trim();
+
+                        const formData = new FormData();
+                        formData.append('wifi_ssid', ssid);
+                        formData.append('wifi_password', password);
+                        formData.append('wifi_ip', ip);
+                        formData.append('wifi_mask', mask);
+                        formData.append('wifi_gateway', gateway);
+                        formData.append('wifi_dns', dns);
+                        
+                        // Enviar dados
+                        fetch('/wifi_config_save', {
+                            method: 'POST',
+                            body: new URLSearchParams(formData)
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('✅ Configurações WiFi salvas com sucesso!');
+                                // Mantemos o formulário preenchido para facilitar conexão posterior
+                            } else {
+                                throw new Error('Erro no servidor');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro ao salvar:', error);
+                            alert('❌ Erro ao salvar configurações. Tente novamente.');
+                        });
+                    }
+                });
+            }
+            // Inicializar estado do botão de mostrar/ocultar senha do WiFi
+            (function initWifiPasswordToggle() {
+                const passwordInput = document.getElementById('wifi_password');
+                if (!passwordInput) return;
+                const passwordToggleBtn = passwordInput.parentElement.querySelector('.password-toggle-btn');
+                if (!passwordToggleBtn) return;
+                // Se o campo estiver desabilitado (por exemplo, rede aberta), desabilitar botão
+                if (passwordInput.disabled) {
+                    passwordToggleBtn.disabled = true;
+                    passwordToggleBtn.style.opacity = '0.5';
+                } else {
+                    passwordToggleBtn.disabled = false;
+                    passwordToggleBtn.style.opacity = '1';
+                }
+            })();
+        });
+
+        // Função que salva as configurações e em seguida tenta conectar
+        function saveAndConnect() {
+            const btn = document.getElementById('btn-save-connect');
+            const ssid = document.getElementById('wifi_ssid').value.trim();
+            const password = document.getElementById('wifi_password').value;
+
+            if (!ssid) {
+                alert('Por favor, selecione ou digite o SSID da rede WiFi.');
+                return;
+            }
+
+            if (!confirm(`Salvar configurações WiFi e conectar agora?\nSSID: ${ssid}\nSenha: ${password ? '***' : '(sem senha)'}`)) {
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Salvando e conectando...';
+
+            // Primeiro, salvar as configurações
+            const ip = document.getElementById('wifi_ip').value.trim();
+            const mask = document.getElementById('wifi_mask').value.trim();
+            const gateway = document.getElementById('wifi_gateway').value.trim();
+            const dns = document.getElementById('wifi_dns').value.trim();
+
+            const formData = new FormData();
+            formData.append('wifi_ssid', ssid);
+            formData.append('wifi_password', password);
+            formData.append('wifi_ip', ip);
+            formData.append('wifi_mask', mask);
+            formData.append('wifi_gateway', gateway);
+            formData.append('wifi_dns', dns);
+
+            fetch('/wifi_config_save', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Falha ao salvar configurações');
+                return response.text();
+            })
+            .then(() => {
+                // Agora solicitar ao backend que tente conectar
+                return fetch('/wifi_connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ssid: ssid, password: password })
+                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const ipMsg = data.ip ? ('\nIP previsto após reinício: ' + data.ip) : '';
+                    alert('✅ ' + data.message + ipMsg + '\n\nO ESP32 reiniciará e tentará conectar à nova rede.');
+                } else {
+                    throw new Error(data.error || 'Erro ao conectar');
+                }
+            })
+            .catch(error => {
+                console.error('Erro saveAndConnect:', error);
+                const msg = (error && error.message) ? error.message.toLowerCase() : '';
+                // Tratamento amigável para erro de rede quando o dispositivo reinicia/muda de rede
+                if (msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('network request failed')) {
+                    alert('⚠️ Pedido enviado, mas o navegador não conseguiu comunicar com o dispositivo. \nO ESP32 provavelmente está reiniciando ou mudou de rede (por exemplo, saiu do AP 192.168.4.1).\nAguarde ~20 segundos e verifique se você está conectado ao AP do dispositivo ou à nova rede.');
+                } else {
+                    alert('❌ ' + error.message);
+                }
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = '💾🔌 Salvar e Conectar';
+            });
+        }
+
+        // Controle de exibição das seções baseado no modo selecionado
+        function showModeSection(mode) {
+            // Ocultar todas as seções
+            document.getElementById('ap-section').style.display = 'none';
+            document.getElementById('rtu-section').style.display = 'none';
+            document.getElementById('tcp-section').style.display = 'none';
+            
+            // Mostrar apenas a seção correspondente ao modo selecionado
+            switch(mode) {
+                case 'ap':
+                    document.getElementById('ap-section').style.display = 'block';
+                    break;
+                case 'rtu':
+                    document.getElementById('rtu-section').style.display = 'block';
+                    break;
+                case 'tcp':
+                    document.getElementById('tcp-section').style.display = 'block';
+                    break;
+            }
+        }
+
+        // Função para mostrar/ocultar senha
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(inputId + '_icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = '🙈'; // Ícone para ocultar
+            } else {
+                input.type = 'password';
+                icon.textContent = '👁️'; // Ícone para mostrar
+            }
+        }
+
+        // Função para definir valores dos selects RTU
+        function setRtuValues() {
+            // Valores do backend (será substituído pelo template)
+            const rtuBaudrate = '{{RTU_BAUDRATE}}';
+            const rtuDatabits = '{{RTU_DATABITS}}';
+            const rtuParity = '{{RTU_PARITY}}';
+            const rtuStopbits = '{{RTU_STOPBITS}}';
+            
+            // Definir valores nos selects
+            const baudrateSelect = document.getElementById('rtu_baudrate');
+            if (baudrateSelect && rtuBaudrate && rtuBaudrate !== '{{RTU_BAUDRATE}}') {
+                baudrateSelect.value = rtuBaudrate;
+            }
+            
+            const databitsSelect = document.getElementById('rtu_databits');
+            if (databitsSelect && rtuDatabits && rtuDatabits !== '{{RTU_DATABITS}}') {
+                databitsSelect.value = rtuDatabits;
+            }
+            
+            const paritySelect = document.getElementById('rtu_parity');
+            if (paritySelect && rtuParity && rtuParity !== '{{RTU_PARITY}}') {
+                paritySelect.value = rtuParity;
+            }
+            
+            const stopbitsSelect = document.getElementById('rtu_stopbits');
+            if (stopbitsSelect && rtuStopbits && rtuStopbits !== '{{RTU_STOPBITS}}') {
+                stopbitsSelect.value = rtuStopbits;
+            }
+        }
+
+        // Adicionar event listeners aos botões de rádio
+        document.addEventListener('DOMContentLoaded', function() {
+            const modeRadios = document.querySelectorAll('input[name="operation_mode"]');
+            
+            modeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.checked) {
+                        showModeSection(this.value);
+                    }
+                });
+            });
+            
+            // Definir valores RTU salvos
+            setRtuValues();
+            
+            // Mostrar a seção inicial (AP por padrão)
+            showModeSection('ap');
+        });
+    </script>
+    
+</body>
+</html>

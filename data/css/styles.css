@@ -1,0 +1,1196 @@
+/* =============================================================================
+   CSS para Medidor de Combustão - Baseado no Layout de Referência
+   ============================================================================= */
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background-color: #F2F2F2;
+    color: #1C402C;
+    line-height: 1.4;
+    padding: 40px 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start; /* align content to top of page */
+    justify-content: center;
+}
+
+/* Layout da página inicial */
+body > div {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Título principal */
+h1 {
+    font-size: 18px;
+    color: #1C402C;
+    margin-bottom: 30px;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+}
+
+/* Top bar e botão Voltar */
+.top-bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.back-btn {
+    background: transparent;
+    border: 1px solid #7DA641;
+    color: #1C402C;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.back-btn:hover {
+    background: #D4D93D;
+    color: #fff;
+}
+
+/* Branding (logo, empresa, programa) para tela de login */
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 18px;
+    text-align: center;
+    width: 100%;
+}
+
+.brand-logo {
+    width: 64px;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+
+.brand-company {
+    font-size: 18px;
+    color: #1C402C;
+    margin: 0;
+    font-weight: 600;
+}
+
+.brand-program {
+    font-size: 13px;
+    color: #1C402C;
+    opacity: 0.9;
+    margin-left: 6px;
+}
+
+.brand-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 360px;
+}
+
+.brand-program {
+    margin-top: 6px;
+}
+
+@media (max-width: 480px) {
+    .brand { gap: 8px; }
+    .brand-logo { width: 48px; }
+    .brand-company { font-size: 16px; }
+    .brand-program { font-size: 12px; }
+}
+
+/* Container dos botões */
+div div {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Estilo dos botões baseado na imagem */
+a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #7DA641;
+    color: white;
+    padding: 14px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 24px;
+    font-weight: 500;
+    gap: 8px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+/* Efeito hover */
+a:hover {
+    background: #D4D93D;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(125, 166, 65, 0.3);
+}
+
+/* Estilos para WiFi */
+#wifi-networks {
+    list-style: none;
+    padding: 0;
+    max-width: 480px;
+    margin: 20px auto;
+}
+
+.ap-item {
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #7DA641;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ap-item:hover {
+    background: #F2F2F2;
+    border-color: #7DA641;
+}
+
+.ap-item.selected {
+    background: #D4D93D;
+    border-color: #7DA641;
+    box-shadow: 0 2px 8px rgba(125, 166, 65, 0.2);
+}
+
+.ap-item label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.signal-strength {
+    color: #1C402C;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Formulários */
+form div {
+    margin: 16px 0;
+}
+
+label {
+    display: block;
+    margin: 8px 0 4px 0;
+    font-weight: 500;
+    color: #1C402C;
+}
+
+input[type="text"], 
+input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #7DA641;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus, 
+input[type="password"]:focus {
+    outline: none;
+    border-color: #7DA641;
+    box-shadow: 0 0 0 3px rgba(125, 166, 65, 0.1);
+}
+button {
+    background: #7DA641;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background: #D4D93D;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Responsividade básica */
+@media (max-width: 480px) {
+    body {
+        padding: 20px 15px;
+    }
+    
+    body > div {
+        padding: 30px 20px;
+    }
+    
+    h1 {
+        font-size: 16px;
+    }
+    
+    a {
+        padding: 12px 18px;
+        font-size: 13px;
+    }
+    
+    #wifi-networks {
+        max-width: 100%;
+    }
+    
+    .ap-item {
+        padding: 8px;
+    }
+}
+
+/* =============================================================================
+   WiFi Status Styles
+   ============================================================================= */
+
+/* Status de conexão */
+#conn_status {
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.status-connected {
+    color: #1C402C;
+    font-weight: 600;
+    background: #D4D93D;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #7DA641;
+}
+
+.status-waiting {
+    color: #1C402C;
+    background: #F2F2F2;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #7DA641;
+}
+
+.status-error {
+    color: #1C402C;
+    background: #F27507;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #F27507;
+}
+
+/* Botões e formulários WiFi */
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #7DA641;
+    color: white;
+    padding: 14px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    gap: 8px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover {
+    background: #D4D93D;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(125, 166, 65, 0.3);
+}
+
+/* Formulários inline */
+form {
+    display: inline-block;
+    margin-right: 8px;
+}
+
+/* Status badges para conexão WiFi */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.status-connected {
+    background-color: #D4D93D;
+    color: #1C402C;
+    border: 1px solid #7DA641;
+}
+
+.status-connecting {
+    background-color: #F27507;
+    color: #1C402C;
+    border: 1px solid #F27507;
+}
+
+.status-error {
+    background-color: #F27507;
+    color: white;
+    border: 1px solid #F27507;
+}
+
+.status-disconnected {
+    background-color: #F2F2F2;
+    color: #1C402C;
+    border: 1px solid #7DA641;
+}
+
+/* Status items */
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.status-item:last-child {
+    border-bottom: none;
+}
+
+/* Progress bar para conexão */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #F2F2F2;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(45deg, #7DA641, #D4D93D);
+    animation: progress-animation 2s linear infinite;
+}
+
+@keyframes progress-animation {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Status message */
+.status-message {
+    text-align: center;
+    padding: 20px;
+    background-color: #F2F2F2;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: #1C402C;
+}
+
+/* Info box */
+.info-box {
+    background-color: #F2F2F2;
+    border-left: 4px solid #7DA641;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+}
+
+.info-box h4 {
+    margin: 0 0 10px 0;
+    color: #1C402C;
+}
+
+.info-box ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.info-box li {
+    margin-bottom: 5px;
+    color: #1C402C;
+}
+
+/* Validation styles */
+.validation-error {
+    color: #F27507;
+    font-size: 0.875em;
+    margin-top: 5px;
+}
+
+input.error {
+    border-color: #F27507 !important;
+    background-color: #F2F2F2;
+}
+
+/* Loading states */
+.btn:disabled {
+    background-color: #F2F2F2;
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* =============================================================================
+   Estilos para Configuração do Dispositivo
+   ============================================================================= */
+
+/* Container principal de configuração */
+.config-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* Cards de configuração */
+.config-card {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    border: 1px solid #7DA641;
+}
+
+.config-card h2 {
+    color: #1C402C;
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Formulários de configuração */
+.config-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.config-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.config-label {
+    font-weight: 500;
+    color: #1C402C;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.config-input {
+    padding: 10px 12px;
+    border: 1px solid #7DA641;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+}
+
+.config-input:focus {
+    outline: none;
+    border-color: #7DA641;
+    box-shadow: 0 0 0 3px rgba(125, 166, 65, 0.1);
+}
+
+.config-input:invalid {
+    border-color: #F27507;
+}
+
+.config-input.error {
+    border-color: #F27507 !important;
+    box-shadow: 0 0 0 3px rgba(242, 117, 7, 0.1);
+}
+
+.config-help {
+    font-size: 12px;
+    color: #1C402C;
+    font-style: italic;
+    margin-top: 2px;
+    opacity: 0.7;
+}
+
+/* Botões de configuração */
+.btn-config {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    min-width: 120px;
+}
+
+.btn-config.btn-primary {
+    background-color: #7DA641;
+    color: white;
+}
+
+.btn-config.btn-primary:hover {
+    background-color: #D4D93D;
+    color: white;
+}
+
+.btn-config.btn-secondary {
+    background-color: #1C402C;
+    color: white;
+}
+
+.btn-config.btn-secondary:hover {
+    background-color: #7DA641;
+}
+
+.btn-config.btn-warning {
+    background-color: #F27507;
+    color: white;
+}
+
+.btn-config.btn-warning:hover {
+    background-color: #D4D93D;
+    color: white;
+}
+
+/* Container para ações do formulário */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+/* Caixa de informações */
+.info-box {
+    background-color: #F2F2F2;
+    border: 1px solid #7DA641;
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.info-box h4 {
+    color: #1C402C;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.info-box p {
+    font-size: 13px;
+    color: #1C402C;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.info-box ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.info-box li {
+    font-size: 13px;
+    color: #1C402C;
+    margin-bottom: 4px;
+}
+
+/* =============================================================================
+   Estilos para Scan WiFi
+   ============================================================================= */
+
+.wifi-scan-section {
+    margin: 16px 0;
+}
+
+.scan-status {
+    background-color: #F2F2F2;
+    border: 1px solid #7DA641;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.scan-status p {
+    margin: 0;
+    color: #1C402C;
+    font-size: 14px;
+}
+
+.wifi-networks {
+    margin-top: 20px;
+}
+
+.wifi-networks h3 {
+    color: #1C402C;
+    font-size: 16px;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.networks-grid {
+    display: grid;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.network-card {
+    background: #F2F2F2;
+    border: 1px solid #7DA641;
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.network-card:hover {
+    background: #D4D93D;
+    border-color: #7DA641;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(125, 166, 65, 0.2);
+}
+
+.network-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.network-name {
+    font-weight: 600;
+    color: #1C402C;
+    font-size: 15px;
+    word-break: break-word;
+}
+
+.network-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.network-details span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: white;
+    border: 1px solid #7DA641;
+}
+
+.signal.signal-strong {
+    color: #1C402C;
+    border-color: #7DA641;
+    background-color: #D4D93D;
+}
+
+.signal.signal-medium {
+    color: #1C402C;
+    border-color: #F27507;
+    background-color: #F2F2F2;
+}
+
+.signal.signal-weak {
+    color: white;
+    border-color: #F27507;
+    background-color: #F27507;
+}
+
+.security {
+    color: #1C402C;
+    border-color: #7DA641;
+    background-color: #F2F2F2;
+}
+
+.channel {
+    color: #1C402C;
+    border-color: #7DA641;
+    background-color: #F2F2F2;
+}
+
+/* Seleção de rede ativa */
+.network-card.selected {
+    background: #D4D93D;
+    border-color: #7DA641;
+    box-shadow: 0 0 0 2px rgba(125, 166, 65, 0.3);
+}
+
+.selection-indicator {
+    text-align: center;
+    font-size: 11px;
+    color: #1C402C;
+    margin-top: 4px;
+    padding: 4px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.network-card:hover .selection-indicator {
+    opacity: 1;
+}
+
+.network-card.selected .selection-indicator {
+    opacity: 1;
+    color: #1C402C;
+    background: rgba(125, 166, 65, 0.2);
+}
+
+/* Formulário de configuração WiFi */
+.wifi-connection-form {
+    margin-top: 24px;
+    padding: 20px;
+    background: #F2F2F2;
+    border: 1px solid #7DA641;
+    border-radius: 8px;
+}
+
+.wifi-connection-form h3 {
+    color: #1C402C;
+    font-size: 16px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.connection-help {
+    color: #1C402C;
+    font-size: 13px;
+    margin-bottom: 16px;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.config-input[readonly] {
+    background-color: #F2F2F2;
+    color: #1C402C;
+}
+
+.config-input:disabled {
+    background-color: #F2F2F2;
+    color: #1C402C;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Password input with toggle button */
+.password-input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.password-input-container .config-input {
+    flex: 1 1 auto;
+}
+
+.password-toggle-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Botões do formulário WiFi */
+.form-actions .btn-config:disabled {
+    background-color: #F2F2F2;
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.form-actions .btn-config:disabled:hover {
+    background-color: #F2F2F2;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+    .network-details {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .network-details span {
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .wifi-connection-form {
+        margin-top: 16px;
+        padding: 16px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn-config {
+        width: 100%;
+    }
+}
+
+/* =============================================================================
+   Estilos para Seleção de Modo de Operação
+   ============================================================================= */
+
+.mode-selection-section {
+    margin-bottom: 30px;
+}
+
+.mode-description {
+    color: #1C402C;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: left;
+    opacity: 0.8;
+}
+
+.mode-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mode-option {
+    display: flex;
+    align-items: center;
+}
+
+.mode-option input[type="radio"] {
+    display: none;
+}
+
+.mode-option label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border: 2px solid #7DA641;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    background: #F2F2F2;
+}
+
+.mode-option label:hover {
+    border-color: #7DA641;
+    background: #D4D93D;
+}
+
+.mode-option input[type="radio"]:checked + label {
+    border-color: #1C402C;
+    background: #D4D93D;
+}
+
+.mode-icon {
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+}
+
+.mode-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    text-align: left;
+}
+
+.mode-info strong {
+    color: #1C402C;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mode-info small {
+    color: #1C402C;
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.7;
+}
+
+/* Responsividade para seleção de modo */
+@media (max-width: 768px) {
+    .mode-option label {
+        padding: 14px;
+        gap: 10px;
+    }
+    
+    .mode-icon {
+        font-size: 18px;
+        width: 20px;
+    }
+    
+    .mode-info strong {
+        font-size: 13px;
+    }
+    
+    .mode-info small {
+        font-size: 11px;
+    }
+}
+
+/* Seções de configuração dinâmicas */
+.config-section {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.config-section:not([style*="display: none"]) {
+    opacity: 1;
+}
+
+.config-section[style*="display: none"] {
+    opacity: 0;
+}
+
+/* Estilos específicos para seleções RTU */
+.config-input select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 32px;
+}
+
+.config-input select:focus {
+    outline: none;
+    border-color: #7DA641;
+    box-shadow: 0 0 0 3px rgba(125, 166, 65, 0.1);
+}
+
+/* =============================================================================
+   Estilos para campos de senha com botão de mostrar/ocultar
+   ============================================================================= */
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-container .config-input {
+    padding-right: 45px;
+    flex: 1;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    z-index: 1;
+}
+
+.password-toggle-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.password-toggle-btn:focus {
+    outline: 2px solid #7DA641;
+    outline-offset: 2px;
+}
+
+.password-toggle-icon {
+    font-size: 16px;
+    user-select: none;
+    line-height: 1;
+}
+
+/* =============================================================================
+   Estilos para Registradores Modbus
+   ============================================================================= */
+
+.registers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.readonly-input {
+    background-color: #F2F2F2 !important;
+    color: #1C402C !important;
+    cursor: not-allowed !important;
+    border: 1px solid #7DA641 !important;
+    opacity: 0.7;
+}
+
+.readonly-input:focus {
+    box-shadow: none !important;
+    border-color: #7DA641 !important;
+}
+
+.config-card h2 {
+    color: #1C402C;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #7DA641;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* =============================================================================
+   Estilos para Página de Informações do Sistema
+   ============================================================================= */
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #F2F2F2;
+    border: 1px solid #7DA641;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.info-item:hover {
+    background-color: #D4D93D;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #1C402C;
+    margin-right: 15px;
+    flex: 1;
+}
+
+.info-value {
+    font-weight: 500;
+    color: #1C402C;
+    text-align: right;
+    font-family: 'Courier New', monospace;
+    background-color: #ffffff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #7DA641;
+    min-width: 120px;
+}
+
+/* Estilo especial para valores importantes */
+.info-value.status-connected {
+    color: #1C402C;
+    background-color: #D4D93D;
+    font-weight: 600;
+}
+
+.info-value.status-disconnected {
+    color: white;
+    background-color: #F27507;
+    font-weight: 600;
+}
+
+.info-value.password-hidden {
+    font-family: inherit;
+    letter-spacing: 2px;
+}
+
+/* Melhorar layout dos registradores e info em dispositivos menores */
+@media (max-width: 768px) {
+    .registers-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .info-label {
+        margin-right: 0;
+    }
+    
+    .info-value {
+        width: 100%;
+        text-align: left;
+    }
+    
+    .config-form-group {
+        margin-bottom: 15px;
+    }
+    
+    .config-label {
+        font-size: 13px;
+    }
+}
+
+/* End of file */

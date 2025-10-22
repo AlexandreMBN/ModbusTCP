@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 - {{PAGE_TITLE}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="status-message">
+                <h2>{{MESSAGE_TITLE}}</h2>
+                <p>{{MESSAGE_TEXT}}</p>
+            <div>
+                <div class="brand">
+                    <div class="brand-main">
+                        <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                        <h2 class="brand-company">Infitech - Automação</h2>
+                    </div>
+                    <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+                </div>
+                <h1>✅ Confirmação</h1>
+        
+                <div>
+                    <div class="progress-fill"></div>
+                </div>
+                <p>Redirecionando em <span id="countdown">{{COUNTDOWN}}</span> segundos...</p>
+            </div>
+            
+            <div class="button-group">
+                <a href="{{RETURN_URL}}" class="btn btn-primary">{{RETURN_TEXT}}</a>
+                <a href="/" class="btn btn-secondary">Página Inicial</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/confirmation.js"></script>
+</body>
+</html>

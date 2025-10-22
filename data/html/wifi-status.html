@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 WiFi Status</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>Status da Conexão WiFi</h2>
+            
+            <div id="connection-status">
+                <div class="status-item">
+                    <strong>Status:</strong> 
+                    <span id="wifi-status" class="status-badge">{{WIFI_STATUS}}</span>
+                <div>
+                    <div class="brand">
+                        <div class="brand-main">
+                            <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                            <h2 class="brand-company">Infitech - Automação</h2>
+                        </div>
+                        <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+                    </div>
+                    <h1>📶 Status WiFi</h1>
+        
+                    <div>
+                    <span id="wifi-ssid">{{WIFI_SSID}}</span>
+                </div>
+                
+                <div class="status-item" id="ip-section" style="display: {{IP_DISPLAY}}">
+                    <strong>IP:</strong> 
+                    <span id="wifi-ip">{{WIFI_IP}}</span>
+                </div>
+                
+                <div class="status-item" id="rssi-section" style="display: {{RSSI_DISPLAY}}">
+                    <strong>Sinal:</strong> 
+                    <span id="wifi-rssi">{{WIFI_RSSI}} dBm</span>
+                </div>
+                
+                <div id="connection-progress" style="display: {{PROGRESS_DISPLAY}}">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <p>Conectando... Aguarde até 30 segundos.</p>
+                </div>
+                
+                <div id="error-message" style="display: {{ERROR_DISPLAY}}">
+                    <p class="error">{{ERROR_MESSAGE}}</p>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" class="btn btn-primary" onclick="checkStatus()">Verificar Status</button>
+                <a href="/wifi-scan" class="btn btn-secondary">Configurar WiFi</a>
+                <a href="/modbus" class="btn btn-secondary">Voltar</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/wifi-status.js"></script>
+</body>
+</html>

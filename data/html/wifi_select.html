@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleção Wi-Fi - Medidor de Combustão</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="config-device-container">
+        <div class="header">
+            <h1 class="config-device-title">📡 Seleção de Rede Wi-Fi</h1>
+            <a class="btn btn-voltar" href="/wifi">⬅️ Voltar</a>
+        <div>
+            <div class="brand">
+                <div class="brand-main">
+                    <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                    <h2 class="brand-company">Infitech - Automação</h2>
+                </div>
+                <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+            </div>
+            <h1>📶 Selecionar WiFi</h1>
+        
+            <div>
+                <h3>📋 Selecionar Rede Wi-Fi</h3>
+                
+                <form class="config-form" action="/wifi_save" method="post">
+                    <div class="form-group">
+                        <button class="btn-config btn-primary" type="button" id="scan-wifi-btn">🔍 Escanear Redes</button>
+                    </div>
+                    
+                    <div id="wifi-networks-list" class="wifi-networks">
+                        <!-- Redes Wi-Fi serão carregadas aqui via JavaScript -->
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Senha da Rede:</label>
+                        <input type="password" name="password" placeholder="Digite a senha da rede selecionada">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="btn-config btn-success" type="submit">🔗 Conectar à Rede Selecionada</button>
+                        <a class="btn-config btn-secondary" href="/wifi">↩️ Configuração Manual</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/scripts.js"></script>
+</body>
+</html>

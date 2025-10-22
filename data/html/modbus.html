@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuração Modbus - Medidor de Combustão</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="config-device-container">
+        <div class="header">
+            <h1 class="config-device-title">📡 Configuração de Comunicação Modbus</h1>
+            <a class="btn btn-voltar" href="/admin">⬅️ Voltar</a>
+        <div>
+            <div class="brand">
+                <div class="brand-main">
+                    <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                    <h2 class="brand-company">Infitech - Automação</h2>
+                </div>
+                <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+            </div>
+            <h1>📊 Modbus</h1>
+        
+            <div>
+            <div class="config-card">
+                <h2>📊 Registradores 2000 - Dados do Sistema (Somente Leitura)</h2>
+                <div class="registers-grid">
+                    <div class="config-form-group">
+                        <label class="config-label">2000 - Valor de Dados:</label>
+                        <input class="config-input readonly-input" type="number" value="{{REG2000_0}}" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registradores 4000 - Valores Lambda/Heat (Editáveis) -->
+            <div class="config-card">
+                <h2>🔥 Registradores 4000 - Controle Lambda/Heat</h2>
+                <div class="registers-grid">
+                    <div class="config-form-group">
+                        <label class="config-label">4000 - Lambda Value:</label>
+                        <input class="config-input" type="number" name="reg4000_0" value="{{REG4000_0}}" step="0.01">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">4001 - Lambda Ref:</label>
+                        <input class="config-input" type="number" name="reg4000_1" value="{{REG4000_1}}" step="0.01">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">4002 - Heat Value:</label>
+                        <input class="config-input" type="number" name="reg4000_2" value="{{REG4000_2}}" step="0.01">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">4003 - Heat Ref:</label>
+                        <input class="config-input" type="number" name="reg4000_3" value="{{REG4000_3}}" step="0.01">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">4004 - Output MB:</label>
+                        <input class="config-input" type="number" name="reg4000_4" value="{{REG4000_4}}">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">4005 - Probe Damaged:</label>
+                        <select class="config-input" name="reg4000_5">
+                            <option value="0" {{REG4000_5_0_SELECTED}}>0 - Normal</option>
+                            <option value="1" {{REG4000_5_1_SELECTED}}>1 - Danificada</option>
+                        </select>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">4006 - Probe Temp Out of Range:</label>
+                        <select class="config-input" name="reg4000_6">
+                            <option value="0" {{REG4000_6_0_SELECTED}}>0 - Normal</option>
+                            <option value="1" {{REG4000_6_1_SELECTED}}>1 - Fora da Faixa</option>
+                        </select>
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">4007 - Compressor Fail:</label>
+                        <select class="config-input" name="reg4000_7">
+                            <option value="0" {{REG4000_7_0_SELECTED}}>0 - Normal</option>
+                            <option value="1" {{REG4000_7_1_SELECTED}}>1 - Falha</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registradores 6000 - Configuração DAC (Editáveis) -->
+            <div class="config-card">
+                <h2>📡 Registradores 6000 - Configuração DAC</h2>
+                <div class="registers-grid">
+                    <div class="config-form-group">
+                        <label class="config-label">6000 - Max DAC0:</label>
+                        <input class="config-input" type="number" name="reg6000_0" value="{{REG6000_0}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">6001 - Força Valor DAC:</label>
+                        <input class="config-input" type="number" name="reg6000_1" value="{{REG6000_1}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">6002 - Reservado:</label>
+                        <input class="config-input" type="number" name="reg6000_2" value="{{REG6000_2}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">6003 - DAC Gain0:</label>
+                        <input class="config-input" type="number" name="reg6000_3" value="{{REG6000_3}}" step="0.01">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">6004 - DAC Offset0:</label>
+                        <input class="config-input" type="number" name="reg6000_4" value="{{REG6000_4}}" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registradores 9000 - Especificações da Unidade (Editáveis) -->
+            <div class="config-card">
+                <h2>🏷️ Registradores 9000 - Especificações da Unidade</h2>
+                <div class="registers-grid">
+                    <div class="config-form-group">
+                        <label class="config-label">9000 - Valor Zero:</label>
+                        <input class="config-input" type="number" name="reg9000_0" value="{{REG9000_0}}">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9001 - Valor Um:</label>
+                        <input class="config-input" type="number" name="reg9000_1" value="{{REG9000_1}}">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9002 - Firm Ver Hi:</label>
+                        <input class="config-input" type="number" name="reg9000_2" value="{{REG9000_2}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9003 - Firm Ver Lo:</label>
+                        <input class="config-input" type="number" name="reg9000_3" value="{{REG9000_3}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9004 - Valor Quatro:</label>
+                        <input class="config-input" type="number" name="reg9000_4" value="{{REG9000_4}}">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9005 - Valor Cinco:</label>
+                        <input class="config-input" type="number" name="reg9000_5" value="{{REG9000_5}}">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9006 - Lot Num 0:</label>
+                        <input class="config-input" type="number" name="reg9000_6" value="{{REG9000_6}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9007 - Lot Num 1:</label>
+                        <input class="config-input" type="number" name="reg9000_7" value="{{REG9000_7}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9008 - Lot Num 2:</label>
+                        <input class="config-input" type="number" name="reg9000_8" value="{{REG9000_8}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9009 - Lot Num 3:</label>
+                        <input class="config-input" type="number" name="reg9000_9" value="{{REG9000_9}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9010 - Lot Num 4:</label>
+                        <input class="config-input" type="number" name="reg9000_10" value="{{REG9000_10}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9011 - Lot Num 5:</label>
+                        <input class="config-input" type="number" name="reg9000_11" value="{{REG9000_11}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9012 - Waf Num:</label>
+                        <input class="config-input" type="number" name="reg9000_12" value="{{REG9000_12}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9013 - Coord X0:</label>
+                        <input class="config-input" type="number" name="reg9000_13" value="{{REG9000_13}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9014 - Coord X1:</label>
+                        <input class="config-input" type="number" name="reg9000_14" value="{{REG9000_14}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9015 - Coord Y0:</label>
+                        <input class="config-input" type="number" name="reg9000_15" value="{{REG9000_15}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9016 - Coord Y1:</label>
+                        <input class="config-input" type="number" name="reg9000_16" value="{{REG9000_16}}" min="0" max="65535">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9017 - Valor 17:</label>
+                        <input class="config-input" type="number" name="reg9000_17" value="{{REG9000_17}}">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9018 - Valor 18:</label>
+                        <input class="config-input" type="number" name="reg9000_18" value="{{REG9000_18}}">
+                    </div>
+                    <div class="config-form-group">
+                        <label class="config-label">9019 - Valor 19:</label>
+                        <input class="config-input" type="number" name="reg9000_19" value="{{REG9000_19}}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="form-actions" style="text-align: center; margin-top: 30px;">
+                <button class="btn-config btn-success" type="submit">💾 Salvar Registradores</button>
+                <a class="btn-config btn-secondary" href="/admin">↩️ Cancelar</a>
+                <button class="btn-config btn-warning" type="button" onclick="location.reload()">🔄 Recarregar</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

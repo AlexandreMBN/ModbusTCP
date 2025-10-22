@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecionar WiFi - Medidor de Combustão</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div>
+        <h1>📶 Escolha sua rede Wi-Fi</h1>
+        <form action="/wifi_save" method="post">
+            <ul id="wifi-networks">
+                {{WIFI_LIST}}
+            </ul>
+            
+            <div>
+                <label>SSID:</label>
+                <input type="text" name="ssid" id="ssid_input" value="{{SELECTED_SSID}}" required>
+                
+                <label>Senha:</label>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input type="password" name="password" id="password_input" required>
+                    <button type="button" id="password_input_toggle" class="btn btn-tertiary" onclick="togglePasswordVisibility('password_input','password_input_toggle')">Mostrar</button>
+                <div>
+                    <div class="brand">
+                        <div class="brand-main">
+                            <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                            <h2 class="brand-company">Infitech - Automação</h2>
+                        </div>
+                        <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+                    </div>
+                    <h1>📶 Selecionar WiFi (Template)</h1>
+        
+                    <div>
+                <button type="submit">💾 Salvar e conectar</button>
+                <a href="/wifi_scan">🔄 Scan</a>
+                <a href="/admin">⬅️ Voltar</a>
+            </div>
+        </form>
+    </div>
+    
+    <script src="/js/wifi_selection.js"></script>
+    <script src="/js/scripts.js"></script>
+</body>
+</html>

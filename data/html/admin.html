@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Controle - Medidor de Combustão</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div>
+        <div class="top-bar" style="display:flex; align-items:center; justify-content:flex-start; gap:12px; margin-bottom:12px;">
+            <button class="back-btn" onclick="history.back()" aria-label="Voltar">◀ Voltar</button>
+            <h1>⚙️ Painel de Controle</h1>
+        </div>
+
+        <div class="brand">
+            <div class="brand-main">
+                <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                <h2 class="brand-company">Infitech - Automação</h2>
+            </div>
+            <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+        </div>
+
+        <!-- Informações do Usuário -->
+        <div class="config-card" style="margin: 15px 0; padding: 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; border-left: 4px solid #28a745;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin: 0; color: #1C402C; font-size: 14px;">{{USER_LEVEL}}</h3>
+                    <p style="margin: 5px 0 0 0; color: #6c757d; font-size: 12px;">{{USER_PERMISSIONS}}</p>
+                </div>
+                <a href="/logout" style="background: #dc3545; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 12px;">🚪 Sair</a>
+            </div>
+        </div>
+
+        <!-- 🔷 CONTEÚDO PARA USUÁRIO PADRÃO (adm) -->
+        <div {{SHOW_BASIC_CONTENT}}>
+            <div>
+                <a href="/config_unidade">
+                    🔧 Configuração de Dispositivo
+                </a>
+            </div>
+            
+            <div>
+                <a href="/mqtt_config">
+                    📡 Configuração MQTT
+                </a>
+            </div>
+            
+            <!-- Registradores 2000 - Apenas para usuário padrão -->
+            <div class="config-card" style="margin: 20px 0; text-align: left;">
+                <h2 style="color: #1C402C; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #7DA641; padding-bottom: 8px;">📊 Registradores de Monitoramento (2000)</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">📈 Valores de Leitura (Somente Visualização)</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">2000 - Valor Principal:</span>
+                            <span class="info-value" style="background: #f8f9fa; padding: 6px 12px; border-radius: 4px; border: 1px solid #dee2e6; display: inline-block; min-width: 80px; text-align: center;">{{REG2000_0}}</span>
+                        </div>
+                    </div>
+                    <p style="color: #6c757d; font-size: 12px; margin-top: 10px;">
+                        ℹ️ Estes valores são atualizados automaticamente pelo sistema.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Seção de Alarmes - Para usuário padrão -->
+            <div class="config-card" style="margin: 20px 0; text-align: left;">
+                <h2 style="color: #dc3545; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #dc3545; padding-bottom: 8px;">🚨 Alarmes do Sistema</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;">
+                        <h3 style="color: #856404; font-size: 14px; margin: 0 0 10px 0;">⚠️ Status dos Alarmes</h3>
+                        <p style="color: #6c757d; font-size: 12px; margin: 0;">
+                            Funcionalidade em desenvolvimento. Em breve será possível visualizar e gerenciar alarmes do sistema.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔷 CONTEÚDO PARA ADMINISTRADOR (root) -->
+        <div {{SHOW_ADMIN_CONTENT}}>
+            <div>
+                <a href="/config_unidade">
+                    🔧 Configuração de Dispositivo
+                </a>
+            </div>
+            
+            <div>
+                <a href="/mqtt_config">
+                    🔐 Configurar MQTT/TLS
+                </a>
+            </div>
+            
+            <!-- Seção Completa dos Registradores Modbus - Apenas para Admin -->
+            <div class="config-card" style="margin: 20px 0; text-align: left;">
+                <h2 style="color: #1C402C; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #7DA641; padding-bottom: 8px;">📊 Registradores Modbus - Painel Completo</h2>
+                
+                <form action="/modbus_registers_save" method="post" style="margin: 0;">
+                    
+                    <!-- Registradores 1000 - Configuração RTU -->
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">⚙️ Configuração RTU (1000)</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">1000 - Baudrate:</span>
+                                <input class="config-input" type="number" name="reg1000_0" value="{{RTU_BAUDRATE}}" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">1001 - Slave Address:</span>
+                                <input class="config-input" type="number" name="reg1000_1" value="{{RTU_SLAVE_ADDRESS}}" style="min-width: 100px; font-size: 12px;">
+                            
+                            
+                                <span class="info-label">1002 - Parity:</span>
+                                <select class="config-input" name="reg1000_2" style="min-width: 100px; font-size: 12px;">
+                                    <option value="0" {{RTU_PARITY_0_SELECTED}}>0 - None</option>
+                                    <option value="1" {{RTU_PARITY_1_SELECTED}}>1 - Even</option>
+                                    <option value="2" {{RTU_PARITY_2_SELECTED}}>2 - Odd</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Registradores 2000 - Dados (Somente Leitura) -->
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">📊 Dados do Sistema (2000) - Somente Leitura</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">2000 - Valor de Dados:</span>
+                                <span class="info-value readonly-input">{{REG2000_0}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Registradores 4000 - Lambda/Heat -->
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">🔥 Controle Lambda/Heat (4000)</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">4000 - Lambda Value:</span>
+                                <input class="config-input" type="number" name="reg4000_0" value="{{REG4000_0}}" step="0.01" style="min-width: 100px; font-size: 12px;">
+                           
+                                <span class="info-label">4001 - Lambda Ref:</span>
+                                <input class="config-input" type="number" name="reg4000_1" value="{{REG4000_1}}" step="0.01" style="min-width: 100px; font-size: 12px;">
+                            
+                            
+                                <span class="info-label">4002 - Heat Value:</span>
+                                <input class="config-input" type="number" name="reg4000_2" value="{{REG4000_2}}" step="0.01" style="min-width: 100px; font-size: 12px;">
+                            
+                            
+                                <span class="info-label">4003 - Heat Ref:</span>
+                                <input class="config-input" type="number" name="reg4000_3" value="{{REG4000_3}}" step="0.01" style="min-width: 100px; font-size: 12px;">
+                           
+                            
+                                <span class="info-label">4004 - Output MB:</span>
+                                <input class="config-input" type="number" name="reg4000_4" value="{{REG4000_4}}" style="min-width: 100px; font-size: 12px;">
+                            
+                            
+                                <span class="info-label">4005 - Probe Damaged:</span>
+                                <select class="config-input" name="reg4000_5" style="min-width: 100px; font-size: 12px;">
+                                    <option value="0" {{REG4000_5_0_SELECTED}}>0 - Normal</option>
+                                    <option value="1" {{REG4000_5_1_SELECTED}}>1 - Danificada</option>
+                                </select>
+                            
+                                <span class="info-label">4006 - Probe Temp Out:</span>
+                                <select class="config-input" name="reg4000_6" style="min-width: 100px; font-size: 12px;">
+                                    <option value="0" {{REG4000_6_0_SELECTED}}>0 - Normal</option>
+                                    <option value="1" {{REG4000_6_1_SELECTED}}>1 - Fora da Faixa</option>
+                                </select>
+                            
+                                <span class="info-label">4007 - Compressor Fail:</span>
+                                <select class="config-input" name="reg4000_7" style="min-width: 100px; font-size: 12px;">
+                                    <option value="0" {{REG4000_7_0_SELECTED}}>0 - Normal</option>
+                                    <option value="1" {{REG4000_7_1_SELECTED}}>1 - Falha</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Registradores 6000 - Configuração DAC -->
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">📡 Configuração DAC (6000)</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">6000 - Max DAC0:</span>
+                                <input class="config-input" type="number" name="reg6000_0" value="{{REG6000_0}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">6001 - Força Valor DAC:</span>
+                                <input class="config-input" type="number" name="reg6000_1" value="{{REG6000_1}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">6002 - Reservado:</span>
+                                <input class="config-input" type="number" name="reg6000_2" value="{{REG6000_2}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">6003 - DAC Gain0:</span>
+                                <input class="config-input" type="number" name="reg6000_3" value="{{REG6000_3}}" step="0.01" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">6004 - DAC Offset0:</span>
+                                <input class="config-input" type="number" name="reg6000_4" value="{{REG6000_4}}" step="0.01" style="min-width: 100px; font-size: 12px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Registradores 9000 - Especificações da Unidade -->
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">🏷️ Especificações da Unidade (9000)</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">9000 - Valor Zero:</span>
+                                <input class="config-input" type="number" name="reg9000_0" value="{{REG9000_0}}" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9001 - Valor Um:</span>
+                                <input class="config-input" type="number" name="reg9000_1" value="{{REG9000_1}}" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9002 - Firm Ver Hi:</span>
+                                <input class="config-input" type="number" name="reg9000_2" value="{{REG9000_2}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9003 - Firm Ver Lo:</span>
+                                <input class="config-input" type="number" name="reg9000_3" value="{{REG9000_3}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9004 - Valor Quatro:</span>
+                                <input class="config-input" type="number" name="reg9000_4" value="{{REG9000_4}}" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9005 - Valor Cinco:</span>
+                                <input class="config-input" type="number" name="reg9000_5" value="{{REG9000_5}}" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9006 - Lot Num 0:</span>
+                                <input class="config-input" type="number" name="reg9000_6" value="{{REG9000_6}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9007 - Lot Num 1:</span>
+                                <input class="config-input" type="number" name="reg9000_7" value="{{REG9000_7}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9008 - Lot Num 2:</span>
+                                <input class="config-input" type="number" name="reg9000_8" value="{{REG9000_8}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9009 - Lot Num 3:</span>
+                                <input class="config-input" type="number" name="reg9000_9" value="{{REG9000_9}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9010 - Lot Num 4:</span>
+                                <input class="config-input" type="number" name="reg9000_10" value="{{REG9000_10}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9011 - Lot Num 5:</span>
+                                <input class="config-input" type="number" name="reg9000_11" value="{{REG9000_11}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9012 - Waf Num:</span>
+                                <input class="config-input" type="number" name="reg9000_12" value="{{REG9000_12}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9013 - Coord X0:</span>
+                                <input class="config-input" type="number" name="reg9000_13" value="{{REG9000_13}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9014 - Coord X1:</span>
+                                <input class="config-input" type="number" name="reg9000_14" value="{{REG9000_14}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9015 - Coord Y0:</span>
+                                <input class="config-input" type="number" name="reg9000_15" value="{{REG9000_15}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9016 - Coord Y1:</span>
+                                <input class="config-input" type="number" name="reg9000_16" value="{{REG9000_16}}" min="0" max="65535" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9017 - Valor 17:</span>
+                                <input class="config-input" type="number" name="reg9000_17" value="{{REG9000_17}}" style="min-width: 100px; font-size: 12px;">
+                            
+                                <span class="info-label">9018 - Valor 18:</span>
+                                <input class="config-input" type="number" name="reg9000_18" value="{{REG9000_18}}" style="min-width: 100px; font-size: 12px;">
+                           
+                                <span class="info-label">9019 - Valor 19:</span>
+                                <input class="config-input" type="number" name="reg9000_19" value="{{REG9000_19}}" style="min-width: 100px; font-size: 12px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #7DA641;">
+                        <button class="btn-config btn-primary" type="submit" style="margin: 5px;">💾 Salvar Todas as Alterações</button>
+                        <button class="btn-config btn-warning" type="button" onclick="location.reload()" style="margin: 5px;">🔄 Recarregar Valores</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div>
+                <a href="/info">
+                    ℹ️ Informações do Sistema
+                </a>
+            </div>
+        </div>
+
+        <!-- 🔷 LINKS COMUNS PARA AMBOS OS USUÁRIOS -->
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="/info" style="display: inline-block; margin: 5px;">
+                ℹ️ Informações do Sistema
+            </a>
+        </div>
+        </div>
+    </div>
+    
+    <script src="/js/scripts.js"></script>
+</body>
+</html>

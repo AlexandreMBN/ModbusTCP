@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 WiFi Scan</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>Configuração de Rede WiFi</h2>
+            <div id="scan-status" class="status-message">
+                <p>Escaneando redes WiFi...</p>
+            <div>
+                <div class="brand">
+                    <div class="brand-main">
+                        <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                        <h2 class="brand-company">Infitech - Automação</h2>
+                    </div>
+                    <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+                </div>
+                <h1>🔎 Escaneamento WiFi</h1>
+        
+                <div>
+                    <label for="wifi-select">Rede WiFi Disponível:</label>
+                    <select id="wifi-select" name="ssid" required>
+                        {{WIFI_OPTIONS}}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="wifi-password">Senha:</label>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <input type="password" id="wifi-password" name="password" placeholder="Digite a senha da rede">
+                        <button type="button" id="wifi-password-toggle" class="btn btn-tertiary" onclick="togglePasswordVisibility('wifi-password','wifi-password-toggle')">Mostrar</button>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Conectar</button>
+                    <button type="button" class="btn btn-secondary" onclick="rescanWifi()">Escanear Novamente</button>
+                </div>
+            </form>
+            
+            <div class="button-group">
+                <a href="/modbus" class="btn btn-secondary">Voltar</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/wifi-scan.js"></script>
+</body>
+</html>

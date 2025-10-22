@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Manual - Medidor de Combustão</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div>
+        <h1>📶 Escolha sua rede Wi-Fi</h1>
+        <h3>{{STATUS_MESSAGE}}</h3>
+        
+        <form action="/wifi_save" method="post">
+            <div>
+                <label>SSID:</label>
+                <input type="text" name="ssid" placeholder="Nome da rede WiFi" required>
+                
+                <label>Senha:</label>
+                <input type="password" name="password" placeholder="Senha da rede" required>
+            <div>
+                <div class="brand">
+                    <div class="brand-main">
+                        <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                        <h2 class="brand-company">Infitech - Automação</h2>
+                    </div>
+                    <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+                </div>
+                <h1>✍️ Configuração Manual WiFi</h1>
+        
+                <div>
+                <a href="/wifi_scan">🔄 Escanear redes</a>
+                <a href="/admin">⬅️ Voltar</a>
+            </div>
+        </form>
+    </div>
+    
+    <script src="/js/scripts.js"></script>
+</body>
+</html>

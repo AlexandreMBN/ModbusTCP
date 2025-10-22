@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 AP Configuration</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="brand">
+            <div class="brand-main">
+                <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+                <h2 class="brand-company">Infitech - Automação</h2>
+            </div>
+            <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+        </div>
+        <div class="card">
+            <h2>Configuração do Access Point</h2>
+            <p>Configure as credenciais do ponto de acesso WiFi do ESP32</p>
+            
+            <form id="ap-config-form" method="post" action="/ap-save">
+                <div class="form-group">
+                    <label for="ap-ssid">Nome da Rede (SSID):</label>
+                    <input type="text" id="ap-ssid" name="ssid" value="{{AP_SSID}}" required maxlength="32" 
+                           placeholder="Ex: ESP32-ModbusServer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ap-username">Nome de Usuário:</label>
+                    <input type="text" id="ap-username" name="username" value="{{AP_USERNAME}}" required maxlength="32" 
+                           placeholder="admin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ap-password">Senha WiFi:</label>
+                    <input type="password" id="ap-password" name="password" value="{{AP_PASSWORD}}" required minlength="8" maxlength="63"
+                           placeholder="Mínimo 8 caracteres">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ap-ip">Endereço IP do AP:</label>
+                    <input type="text" id="ap-ip" name="ip" value="{{AP_IP}}" required pattern="^(\d{1,3}\.){3}\d{1,3}$"
+                           placeholder="192.168.4.1">
+                </div>
+                
+                <div class="info-box">
+                    <h4>Informações Importantes:</h4>
+                    <ul>
+                        <li>O ESP32 criará uma rede WiFi com estes dados</li>
+                        <li>A senha deve ter pelo menos 8 caracteres</li>
+                        <li>O IP deve estar na faixa válida (ex: 192.168.x.x)</li>
+                        <li>Após salvar, o ESP32 será reiniciado</li>
+                    </ul>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Salvar Configuração</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetToDefaults()">Restaurar Padrões</button>
+                </div>
+            </form>
+            
+            <div class="button-group">
+                <a href="/modbus" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/ap-config.js"></script>
+</body>
+</html>
