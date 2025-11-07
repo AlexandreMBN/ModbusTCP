@@ -3,7 +3,7 @@
 
 #include <esp_http_server.h>
 
-void start_web_server();
+esp_err_t start_web_server();
 esp_err_t root_get_handler(httpd_req_t *req);
 esp_err_t login_get_handler(httpd_req_t *req);
 esp_err_t do_login_handler(httpd_req_t *req);

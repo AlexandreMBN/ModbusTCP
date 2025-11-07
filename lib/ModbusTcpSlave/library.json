@@ -1,0 +1,49 @@
+{
+  "name": "ModbusTcpSlave",
+  "version": "1.0.0",
+  "description": "Modbus TCP Slave library for ESP32 with FreeModbus stack",
+  "keywords": "modbus, tcp, slave, esp32, industrial, automation",
+  "authors": [
+    {
+      "name": "DPM",
+      "email": "dpm@example.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "frameworks": "espidf",
+  "platforms": "espressif32",
+  "headers": "modbus_tcp_slave.h",
+  "build": {
+    "flags": [
+      "-Wno-unused-function",
+      "-Wno-unused-variable",
+      "-Wno-unused-parameter",
+      "-Wno-format",
+      "-Wno-format-security",
+      "-DMB_TCP_ENABLED=1",
+      "-DCONFIG_FMB_TCP_ENABLED=1",
+      "-DCONFIG_FMB_CONTROLLER_SLAVE_ID_SUPPORT=1",
+      "-DCONFIG_FMB_CONTROLLER_NOTIFY_TIMEOUT=20000",
+      "-DCONFIG_FMB_TCP_PORT_MAX_CONN=5",
+      "-DCONFIG_FMB_TCP_CONNECTION_TIMEOUT_SEC=20",
+      "-DCONFIG_FMB_TIMER_PORT_ENABLED=1",
+      "-DCONFIG_FMB_EVENT_QUEUE_TIMEOUT=20"
+    ],
+    "includeDir": "include",
+    "srcFilter": [
+      "+<src/>",
+      "+<freemodbus/common/>",
+      "+<freemodbus/modbus/>", 
+      "-<freemodbus/port/>",
+      "-<freemodbus/serial_master/>",
+      "-<freemodbus/serial_slave/>",
+      "-<freemodbus/tcp_master/>"
+    ],
+    "extraScript": ""
+  },
+  "dependencies": {
+  },
+  "export": {
+    "include": "include"
+  }
+}

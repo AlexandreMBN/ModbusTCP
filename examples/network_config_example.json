@@ -1,0 +1,9 @@
+{
+  "hostname": "esp32-medidor-combustao",
+  "dhcp_enabled": false,
+  "static_ip": "192.168.1.100",
+  "gateway": "192.168.1.1",
+  "subnet": "255.255.255.0",
+  "dns1": "8.8.8.8",
+  "dns2": "8.8.4.4"
+}

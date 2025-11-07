@@ -16,8 +16,8 @@ typedef struct {
 } discrete_reg_params_t;
 
 typedef struct {
-    uint32_t holding_data0;
-    uint32_t holding_data1;
+    float holding_data0;    // Alterado de uint32_t para float (compatibilidade TCP)
+    float holding_data1;    // Alterado de uint32_t para float (compatibilidade TCP)  
     float holding_data2;
     float holding_data3;
     float holding_data4;

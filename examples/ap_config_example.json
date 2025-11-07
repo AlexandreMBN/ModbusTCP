@@ -1,0 +1,9 @@
+{
+  "ssid": "ESP32_Medidor_Combustao",
+  "password": "12345678",
+  "ip": "192.168.4.1",
+  "channel": 6,
+  "max_connections": 4,
+  "hidden": false,
+  "description": "Configuração AP - Salva em /data/config/ap_config.json"
+}

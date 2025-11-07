@@ -1,3 +1,6 @@
+#ifndef MODBUS_MAP_H
+#define MODBUS_MAP_H
+
 #define REG_CONFIG_START		1000      
 #define REG_CONFIG_SIZE			3        
 
@@ -88,3 +91,5 @@ enum reg9000_config {
     valor18,
     valor19
 };
+
+#endif // MODBUS_MAP_H

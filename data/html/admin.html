@@ -81,6 +81,82 @@
 
         <!-- 🔷 CONTEÚDO PARA ADMINISTRADOR (root) -->
         <div {{SHOW_ADMIN_CONTENT}}>
+            <!-- Seção de Upload de Configurações JSON -->
+            <div class="config-card" style="margin: 20px 0; text-align: left;">
+                <h2 style="color: #dc3545; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #dc3545; padding-bottom: 8px;">📂 Gerenciamento de Configurações</h2>
+                
+                <!-- Upload de Arquivos JSON -->
+                <div style="margin-bottom: 25px;">
+                    <details>
+                        <summary style="color: #1C402C; font-size: 14px; margin-bottom: 15px; cursor: pointer; outline: none;">📤 Upload de Configurações JSON</summary>
+                    
+                        <form id="configUploadForm" enctype="multipart/form-data" style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 2px dashed #7DA641;">
+                        <div style="margin-bottom: 15px;">
+                            <label for="configType" style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">Tipo de Configuração:</label>
+                            <select id="configType" name="configType" class="config-input" style="width: 100%; max-width: 300px;">
+                                <option value="">Selecione o tipo...</option>
+                                <option value="rtu">🔧 RTU Config (Modbus RTU)</option>
+                                <option value="ap">📶 AP Config (WiFi Access Point)</option>
+                                <option value="sta">🌐 STA Config (WiFi Station)</option>
+                                <option value="mqtt">📡 MQTT Config (Cliente MQTT)</option>
+                                <option value="network">🌍 Network Config (Rede)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label for="configFile" style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">Arquivo JSON:</label>
+                            <input type="file" id="configFile" name="configFile" accept=".json" class="config-input" style="width: 100%; max-width: 400px;">
+                            <small style="color: #6c757d; font-size: 11px; display: block; margin-top: 5px;">
+                                ⚠️ Apenas arquivos .json são aceitos. Tamanho máximo: 10KB
+                            </small>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button type="button" onclick="uploadConfig()" class="btn-config btn-primary" style="margin-right: 10px;">
+                                📤 Upload e Aplicar
+                            </button>
+                            <button type="button" onclick="resetUploadForm()" class="btn-config btn-secondary">
+                                🔄 Limpar
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div id="uploadStatus" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+                    </details>
+                </div>
+                
+                <!-- Download de Configurações Atuais -->
+                <div style="margin-bottom: 25px;">
+                    <details>
+                        <summary style="color: #1C402C; font-size: 14px; margin-bottom: 15px; cursor: pointer; outline: none;">📥 Download de Configurações Atuais</summary>
+                    <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 15px;">📥 Download de Configurações Atuais</h3>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                            <button onclick="downloadConfig('rtu')" class="btn-config btn-secondary" style="font-size: 12px;">
+                                🔧 RTU Config
+                            </button>
+                            <button onclick="downloadConfig('ap')" class="btn-config btn-secondary" style="font-size: 12px;">
+                                📶 AP Config
+                            </button>
+                            <button onclick="downloadConfig('sta')" class="btn-config btn-secondary" style="font-size: 12px;">
+                                🌐 STA Config
+                            </button>
+                            <button onclick="downloadConfig('mqtt')" class="btn-config btn-secondary" style="font-size: 12px;">
+                                📡 MQTT Config
+                            </button>
+                            <button onclick="downloadConfig('network')" class="btn-config btn-secondary" style="font-size: 12px;">
+                                🌍 Network Config
+                            </button>
+                        </div>
+                        <small style="color: #6c757d; font-size: 11px; display: block; margin-top: 10px; text-align: center;">
+                            💡 Faça backup das configurações atuais antes de fazer uploads
+                        </small>
+                    </div>
+                </div>
+                </details>
+            </div>
+
             <div>
                 <a href="/config_unidade">
                     🔧 Configuração de Dispositivo
@@ -101,6 +177,8 @@
                     
                     <!-- Registradores 1000 - Configuração RTU -->
                     <div style="margin-bottom: 20px;">
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">⚙️ Configuração RTU (1000)</summary>
                         <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">⚙️ Configuração RTU (1000)</h3>
                         <div class="info-grid">
                             <div class="info-item">
@@ -119,10 +197,13 @@
                                 </select>
                             </div>
                         </div>
+                        </details>
                     </div>
 
                     <!-- Registradores 2000 - Dados (Somente Leitura) -->
                     <div style="margin-bottom: 20px;">
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">📊 Dados do Sistema (2000) - Somente Leitura</summary>
                         <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">📊 Dados do Sistema (2000) - Somente Leitura</h3>
                         <div class="info-grid">
                             <div class="info-item">
@@ -130,10 +211,13 @@
                                 <span class="info-value readonly-input">{{REG2000_0}}</span>
                             </div>
                         </div>
+                        </details>
                     </div>
 
                     <!-- Registradores 4000 - Lambda/Heat -->
                     <div style="margin-bottom: 20px;">
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">🔥 Controle Lambda/Heat (4000)</summary>
                         <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">🔥 Controle Lambda/Heat (4000)</h3>
                         <div class="info-grid">
                             <div class="info-item">
@@ -175,11 +259,13 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </details>
+                 </div>
 
                     <!-- Registradores 6000 - Configuração DAC -->
                     <div style="margin-bottom: 20px;">
-                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">📡 Configuração DAC (6000)</h3>
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">📡 Configuração DAC (6000)</summary>
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">6000 - Max DAC0:</span>
@@ -198,11 +284,13 @@
                                 <input class="config-input" type="number" name="reg6000_4" value="{{REG6000_4}}" step="0.01" style="min-width: 100px; font-size: 12px;">
                             </div>
                         </div>
-                    </div>
+                    </details>
+                </div>
 
                     <!-- Registradores 9000 - Especificações da Unidade -->
                     <div style="margin-bottom: 20px;">
-                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">🏷️ Especificações da Unidade (9000)</h3>
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">🏷️ Especificações da Unidade (9000)</summary>
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">9000 - Valor Zero:</span>
@@ -266,6 +354,7 @@
                                 <input class="config-input" type="number" name="reg9000_19" value="{{REG9000_19}}" style="min-width: 100px; font-size: 12px;">
                             </div>
                         </div>
+                    </details>
                     </div>
 
                     <!-- Botões de Ação -->
@@ -276,11 +365,11 @@
                 </form>
             </div>
             
-            <div>
+            <!-- <div>
                 <a href="/info">
                     ℹ️ Informações do Sistema
                 </a>
-            </div>
+            </div> -->
         </div>
 
         <!-- 🔷 LINKS COMUNS PARA AMBOS OS USUÁRIOS -->
@@ -293,5 +382,6 @@
     </div>
     
     <script src="/js/scripts.js"></script>
+    <script src="/js/config_manager.js"></script>
 </body>
 </html>

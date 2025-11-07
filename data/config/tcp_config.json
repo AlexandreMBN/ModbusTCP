@@ -1,0 +1,7 @@
+{
+    "port": 502,
+    "slave_id": 1,
+    "max_connections": 5,
+    "timeout_ms": 30000,
+    "auto_start": true
+}

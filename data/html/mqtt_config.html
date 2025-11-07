@@ -5,302 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuração MQTT - Medidor de Combustão</title>
     <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-    <div class="config-device-container">
-        <div class="header">
-            <h1 class="config-device-title">📡 Configuração MQTT</h1>
-            <a class="btn btn-voltar" href="/admin">⬅️ Voltar</a>
-        </div>
 
-        <div class="brand">
-            <div class="brand-main">
-                <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
-                <h2 class="brand-company">Infitech - Automação</h2>
-            </div>
-            <div class="brand-program">Programa: <strong>MCT-01</strong></div>
-        </div>
-
-        <form id="mqttForm" method="POST" action="/mqtt_config" enctype="multipart/form-data">
-            <!-- Configuração Geral -->
-            <div class="config-card">
-                <h2>⚙️ Configuração Geral</h2>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="mqtt_enabled" name="mqtt_enabled"{{MQTT_ENABLED_CHECKED}}>
-                        Habilitar MQTT
-                    </label>
-                    <small>Ativa ou desativa completamente o cliente MQTT</small>
-                </div>
-            </div>
-
-            <!-- Configuração do Broker -->
-            <div class="config-card" id="mqtt_config_section">
-                <h2>🌐 Configuração do Broker</h2>
-                
-                <div class="form-group">
-                    <label for="broker_url">Broker URL: *</label>
-                    <input type="text" id="broker_url" name="broker_url" value="{{BROKER_URL}}" required>
-                    <small>Exemplo: mqtt://broker.hivemq.com ou mqtts://broker.example.com</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="port">Porta: *</label>
-                    <input type="number" id="port" name="port" value="{{PORT}}" min="1" max="65535" required>
-                    <small>Padrão: 1883 (MQTT) ou 8883 (MQTTS)</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="client_id">Client ID: *</label>
-                    <input type="text" id="client_id" name="client_id" value="{{CLIENT_ID}}" required>
-                    <small>Identificador único do cliente no broker</small>
-                </div>
-            </div>
-
-            <!-- Autenticação -->
-            <div class="config-card" id="auth_section">
-                <h2>🔐 Autenticação</h2>
-                
-                <div class="form-group">
-                    <label for="username">Usuário:</label>
-                    <input type="text" id="username" name="username" value="{{USERNAME}}">
-                    <small>Deixe vazio para brokers públicos sem autenticação</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Senha:</label>
-                    <input type="password" id="password" name="password" placeholder="[Protegida]">
-                    <small>Deixe vazio para brokers públicos sem autenticação</small>
-                </div>
-            </div>
-
-            <!-- Configuração TLS/SSL -->
-            <div class="config-card" id="tls_section">
-                <h2>🔒 Configuração TLS/SSL</h2>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="tls_enabled" name="tls_enabled"{{TLS_ENABLED_CHECKED}}>
-                        Habilitar TLS/SSL
-                    </label>
-                    <small>Converte automaticamente mqtt:// para mqtts://</small>
-                </div>
-
-                <div class="form-group" id="cert_section" style="display: none;">
-                    <label>Certificado CA:</label>
-                    <div style="margin: 10px 0;">
-                        <label>
-                            <input type="radio" name="cert_type" value="default" checked>
-                            Usar certificado padrão (ISRG Root X1)
-                        </label>
-                    </div>
-                    <div style="margin: 10px 0;">
-                        <label>
-                            <input type="radio" name="cert_type" value="custom">
-                            Enviar certificado personalizado
-                        </label>
-                    </div>
-                    <div id="cert_upload" style="display: none; margin-top: 10px;">
-                        <label for="cert_file">Arquivo do Certificado (.pem):</label>
-                        <input type="file" id="cert_file" name="cert_file" accept=".pem,.crt,.cer">
-                        <small style="display: block; color: #666; margin-top: 5px;">
-                            Selecione um arquivo de certificado CA em formato PEM
-                        </small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Configurações de QoS e Comportamento -->
-            <div class="config-card" id="qos_section">
-                <h2>📊 Configurações de QoS e Comportamento</h2>
-                
-                <div class="form-group">
-                    <label for="qos">Nível QoS:</label>
-                    <select id="qos" name="qos">
-                        <option value="0"{{QOS_0_SELECTED}}>0 - Fire and forget</option>
-                        <option value="1"{{QOS_1_SELECTED}}>1 - At least once</option>
-                        <option value="2"{{QOS_2_SELECTED}}>2 - Exactly once</option>
-                    </select>
-                    <small>Nível de garantia de entrega das mensagens</small>
-                </div>
-
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="retain" name="retain"{{RETAIN_CHECKED}}>
-                        Reter mensagens no broker
-                    </label>
-                    <small>Mantém a última mensagem armazenada no broker</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="publish_interval">Intervalo de Publicação (ms):</label>
-                    <input type="number" id="publish_interval" name="publish_interval" value="{{PUBLISH_INTERVAL}}" min="100" max="60000">
-                    <small>Intervalo entre publicações (100ms a 60s)</small>
-                </div>
-            </div>
-
-            <!-- Tópicos MQTT (Informativo) -->
-            <div class="config-card">
-                <h2>📋 Tópicos MQTT Publicados</h2>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label">Heat:</span>
-                        <span class="info-value">esp32/sonda_lambda/heat</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Lambda:</span>
-                        <span class="info-value">esp32/sonda_lambda/lambda</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">O2:</span>
-                        <span class="info-value">esp32/sonda_lambda/o2</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Error:</span>
-                        <span class="info-value">esp32/sonda_lambda/error</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Output:</span>
-                        <span class="info-value">esp32/sonda_lambda/output</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Status:</span>
-                        <span class="info-value">esp32/sonda_lambda/status</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Todos os dados:</span>
-                        <span class="info-value">esp32/sonda_lambda/data</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Botões de Ação -->
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">💾 Salvar Configuração</button>
-                <button type="button" class="btn btn-secondary" onclick="testConnection()">🔧 Testar Conexão</button>
-                <button type="button" class="btn btn-secondary" onclick="history.back()">⬅️ Voltar</button>
-            </div>
-        </form>
-
-        <!-- Status da Conexão -->
-        <div class="config-card" id="status_section">
-            <h2>📶 Status da Conexão MQTT</h2>
-            <div id="mqtt_status" class="status-indicator">
-                <span id="status_text">Verificando...</span>
-                <div id="status_icon">⏳</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Controlar visibilidade das seções baseado no checkbox principal
-        const mqttEnabledCheckbox = document.getElementById('mqtt_enabled');
-        const configSections = document.querySelectorAll('#mqtt_config_section, #auth_section, #tls_section, #qos_section');
-        
-        function toggleMqttSections() {
-            const isEnabled = mqttEnabledCheckbox.checked;
-            configSections.forEach(section => {
-                section.style.display = isEnabled ? 'block' : 'none';
-            });
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
         }
 
-        // Controlar exibição dos campos de certificado
-        const tlsCheckbox = document.getElementById('tls_enabled');
-        const certSection = document.getElementById('cert_section');
-        const certRadios = document.querySelectorAll('input[name="cert_type"]');
-        const certUpload = document.getElementById('cert_upload');
-        
-        function toggleCertSection() {
-            if (tlsCheckbox.checked) {
-                certSection.style.display = 'block';
-            } else {
-                certSection.style.display = 'none';
-                certUpload.style.display = 'none';
-            }
-        }
-        
-        function toggleCertUpload() {
-            const customSelected = document.querySelector('input[name="cert_type"]:checked').value === 'custom';
-            certUpload.style.display = customSelected ? 'block' : 'none';
+        .config-device-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
 
-        // Event listeners
-        mqttEnabledCheckbox.addEventListener('change', toggleMqttSections);
-        tlsCheckbox.addEventListener('change', toggleCertSection);
-        certRadios.forEach(radio => {
-            radio.addEventListener('change', toggleCertUpload);
-        });
-        
-        // Estado inicial
-        toggleMqttSections();
-        toggleCertSection();
-        toggleCertUpload();
-
-        // Função para testar conexão
-        function testConnection() {
-            const statusText = document.getElementById('status_text');
-            const statusIcon = document.getElementById('status_icon');
-            
-            statusText.textContent = 'Testando conexão...';
-            statusIcon.textContent = '⏳';
-            
-            // Simular teste (implementar API real)
-            setTimeout(() => {
-                statusText.textContent = 'Teste de conexão implementado na API';
-                statusIcon.textContent = 'ℹ️';
-            }, 2000);
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        // Verificar status MQTT periodicamente
-        function checkMqttStatus() {
-            fetch('/api/mqtt/status')
-                .then(response => response.json())
-                .then(data => {
-                    const statusText = document.getElementById('status_text');
-                    const statusIcon = document.getElementById('status_icon');
-                    
-                    switch(data.status) {
-                        case 'connected':
-                            statusText.textContent = 'Conectado ao broker';
-                            statusIcon.textContent = '✅';
-                            break;
-                        case 'connecting':
-                            statusText.textContent = 'Conectando...';
-                            statusIcon.textContent = '🔄';
-                            break;
-                        case 'disconnected':
-                            statusText.textContent = 'Desconectado';
-                            statusIcon.textContent = '❌';
-                            break;
-                        default:
-                            statusText.textContent = 'Status desconhecido';
-                            statusIcon.textContent = '❓';
-                    }
-                })
-                .catch(() => {
-                    const statusText = document.getElementById('status_text');
-                    const statusIcon = document.getElementById('status_icon');
-                    statusText.textContent = 'Erro ao verificar status';
-                    statusIcon.textContent = '⚠️';
-                });
+        .config-device-title {
+            margin: 0;
+            color: #333;
         }
 
-        // Verificar status inicialmente e a cada 5 segundos
-        checkMqttStatus();
-        setInterval(checkMqttStatus, 5000);
-    </script>
-</body>
-</html>
+        .btn-voltar {
+            background: #ccc;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 6px;
+            color: #000;
+        }
+
+        .brand {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .brand-logo {
+            width: 100px;
+            border-radius: 8px;
+        }
+
+        .config-card {
+            margin-top: 25px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .config-card h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .config-form-group {
+            margin: 10px 0;
+        }
+
+        .config-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .btn-config, .test-connection {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn-config:hover, .test-connection:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .mqtt-status {
             padding: 10px;
             border-radius: 5px;
             margin: 10px 0;
             font-weight: bold;
+            text-align: center;
         }
+
         .status-connected { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-disconnected { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
         .status-connecting { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-        
+
         .tls-section {
             background: #f8f9fa;
             border: 2px solid #dee2e6;
@@ -308,12 +119,7 @@
             padding: 20px;
             margin: 15px 0;
         }
-        
-        .tls-enabled {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-        
+
         .cert-upload {
             border: 2px dashed #ccc;
             border-radius: 8px;
@@ -324,17 +130,12 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .cert-upload:hover {
             border-color: #007bff;
             background: #f0f8ff;
         }
-        
-        .cert-upload.dragover {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-        
+
         .cert-info {
             background: #e7f3ff;
             border: 1px solid #b8daff;
@@ -343,25 +144,11 @@
             margin: 10px 0;
             font-size: 14px;
         }
-        
-        .test-connection {
-            background: #17a2b8;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 5px;
-        }
-        
-        .test-connection:hover {
-            background: #138496;
-        }
-        
+
         .hidden {
             display: none;
         }
-        
+
         .port-auto {
             color: #6c757d;
             font-size: 12px;
@@ -369,176 +156,142 @@
         }
     </style>
 </head>
+
 <body>
     <div class="config-device-container">
         <div class="header">
-            <h1 class="config-device-title">🔐 Configuração MQTT/TLS</h1>
-            <a class="btn btn-voltar" href="/admin">⬅️ Voltar</a>
+            <h1 class="config-device-title">📡 Configuração MQTT</h1>
+            <a class="btn-voltar" href="/admin">⬅️ Voltar</a>
         </div>
-        
+
         <div class="brand">
-            <div class="brand-main">
-                <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
-                <h2 class="brand-company">Infitech - Automação</h2>
-            </div>
+            <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+            <h2>Infitech - Automação</h2>
             <div class="brand-program">Programa: <strong>MCT-01</strong></div>
         </div>
 
-        <!-- Status da Conexão MQTT -->
-        <div id="mqtt-status" class="mqtt-status status-disconnected">
-            🔌 Status: Desconectado
-        </div>
+        <!-- Status -->
+        <div id="mqtt-status" class="mqtt-status status-disconnected">🔌 Status: Desconectado</div>
 
         <!-- Configuração Básica -->
         <div class="config-card">
-            <h2>📡 Configuração Básica do Broker</h2>
-            
+            <h2>🌐 Configuração do Broker</h2>
             <div class="config-form-group">
-                <label class="config-label">Broker MQTT:</label>
-                <input class="config-input" type="text" id="broker_url" name="broker_url" 
-                       value="{{MQTT_BROKER_URL}}" placeholder="broker.hivemq.com">
-                <small>Ex: broker.hivemq.com ou mqtts://secure.broker.com</small>
+                <label class="config-label">Broker URL:</label>
+                <input class="config-input" id="broker_url" name="broker_url" value="{{MQTT_BROKER_URL}}" placeholder="broker.hivemq.com">
+                <small>Exemplo: mqtt://broker.hivemq.com ou mqtts://broker.exemplo.com</small>
             </div>
-
             <div class="config-form-group">
                 <label class="config-label">Porta:</label>
-                <input class="config-input" type="number" id="port" name="port" 
-                       value="{{MQTT_PORT}}" min="1" max="65535">
+                <input class="config-input" type="number" id="port" name="port" value="{{MQTT_PORT}}" min="1" max="65535">
                 <div class="port-auto">Padrão: 1883 (MQTT) | 8883 (MQTTS)</div>
             </div>
-
             <div class="config-form-group">
                 <label class="config-label">Client ID:</label>
-                <input class="config-input" type="text" id="client_id" name="client_id" 
-                       value="{{MQTT_CLIENT_ID}}" placeholder="ESP32_SondaLambda">
+                <input class="config-input" id="client_id" name="client_id" value="{{MQTT_CLIENT_ID}}" placeholder="ESP32_SondaLambda">
             </div>
         </div>
 
-        <!-- Configuração TLS/SSL -->
+        <!-- TLS -->
         <div class="config-card">
             <h2>🔒 Segurança TLS/SSL</h2>
-            
             <div class="config-form-group">
-                <label class="config-label">
-                    <input type="checkbox" id="tls_enabled" name="tls_enabled" {{MQTT_TLS_CHECKED}}>
-                    Habilitar TLS/SSL (Conexão Segura)
-                </label>
+                <label><input type="checkbox" id="tls_enabled" name="tls_enabled" {{MQTT_TLS_CHECKED}}> Habilitar TLS/SSL</label>
                 <small>Ativa criptografia para proteger os dados transmitidos</small>
             </div>
-
             <div id="tls-section" class="tls-section hidden">
                 <h3>📜 Certificado de Autoridade (CA)</h3>
-                
                 <div class="config-form-group">
                     <label class="config-label">Certificado:</label>
                     <select class="config-input" id="ca_certificate" name="ca_certificate">
-                        <option value="/spiffs/isrgrootx1.pem" {{MQTT_CA_DEFAULT_SELECTED}}>
-                            Let's Encrypt (Incluído)
-                        </option>
-                        <option value="/spiffs/custom_ca.pem" {{MQTT_CA_CUSTOM_SELECTED}}>
-                            Certificado Personalizado
-                        </option>
+                        <option value="/spiffs/isrgrootx1.pem" {{MQTT_CA_DEFAULT_SELECTED}}>Let's Encrypt (Incluído)</option>
+                        <option value="/spiffs/custom_ca.pem" {{MQTT_CA_CUSTOM_SELECTED}}>Certificado Personalizado</option>
                     </select>
                 </div>
-
                 <div id="cert-upload-section" class="hidden">
                     <div class="cert-upload" onclick="document.getElementById('cert-file').click()">
-                        <div>📁 Clique aqui ou arraste um arquivo .pem</div>
-                        <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">
-                            Formatos aceitos: .pem, .crt, .cer (máx. 10KB)
-                        </div>
-                        <input type="file" id="cert-file" accept=".pem,.crt,.cer" style="display: none;">
+                        📁 Clique aqui ou arraste um arquivo .pem
+                        <input type="file" id="cert-file" accept=".pem,.crt,.cer" style="display:none;">
                     </div>
-                    
                     <div id="cert-status" class="cert-info hidden"></div>
                 </div>
-
-                <div class="cert-info">
-                    <strong>ℹ️ Informação sobre Certificados:</strong><br>
-                    • <strong>Let's Encrypt:</strong> Funciona com a maioria dos brokers públicos<br>
-                    • <strong>Personalizado:</strong> Para brokers corporativos ou auto-assinados<br>
-                    • O certificado é usado apenas para verificar a identidade do servidor
-                </div>
             </div>
         </div>
 
-        <!-- Autenticação (Opcional) -->
+        <!-- Autenticação -->
         <div class="config-card">
-            <h2>🔑 Autenticação (Opcional)</h2>
-            
+            <h2>🔑 Autenticação</h2>
             <div class="config-form-group">
                 <label class="config-label">Usuário:</label>
-                <input class="config-input" type="text" id="username" name="username" 
-                       value="{{MQTT_USERNAME}}" placeholder="Deixe vazio se não necessário">
+                <input class="config-input" id="username" name="username" value="{{MQTT_USERNAME}}">
             </div>
-
             <div class="config-form-group">
                 <label class="config-label">Senha:</label>
-                <input class="config-input" type="password" id="password" name="password" 
-                       value="{{MQTT_PASSWORD}}" placeholder="Deixe vazio se não necessário">
+                <input class="config-input" type="password" id="password" name="password" value="{{MQTT_PASSWORD}}">
             </div>
         </div>
 
-        <!-- Configurações Avançadas -->
+        <!-- Avançado -->
         <div class="config-card">
             <h2>⚙️ Configurações Avançadas</h2>
-            
             <div class="config-form-group">
-                <label class="config-label">QoS (Quality of Service):</label>
+                <label class="config-label">QoS:</label>
                 <select class="config-input" id="qos" name="qos">
-                    <option value="0" {{MQTT_QOS_0_SELECTED}}>0 - Máximo uma vez (rápido)</option>
-                    <option value="1" {{MQTT_QOS_1_SELECTED}}>1 - Pelo menos uma vez (padrão)</option>
-                    <option value="2" {{MQTT_QOS_2_SELECTED}}>2 - Exatamente uma vez (lento)</option>
+                    <option value="0" {{MQTT_QOS_0_SELECTED}}>0 - Máximo uma vez</option>
+                    <option value="1" {{MQTT_QOS_1_SELECTED}}>1 - Pelo menos uma vez</option>
+                    <option value="2" {{MQTT_QOS_2_SELECTED}}>2 - Exatamente uma vez</option>
                 </select>
             </div>
-
             <div class="config-form-group">
                 <label class="config-label">Intervalo de Publicação (ms):</label>
-                <input class="config-input" type="number" id="publish_interval" name="publish_interval" 
-                       value="{{MQTT_PUBLISH_INTERVAL}}" min="100" max="60000" step="100">
-                <small>Tempo entre envios de dados (1000ms = 1 segundo)</small>
+                <input class="config-input" type="number" id="publish_interval" name="publish_interval" value="{{MQTT_PUBLISH_INTERVAL}}" min="100" max="60000">
             </div>
-
             <div class="config-form-group">
-                <label class="config-label">
-                    <input type="checkbox" id="retain" name="retain" {{MQTT_RETAIN_CHECKED}}>
-                    Reter Mensagens (Retain)
-                </label>
-                <small>Broker mantém a última mensagem para novos subscribers</small>
+                <label><input type="checkbox" id="retain" name="retain" {{MQTT_RETAIN_CHECKED}}> Reter Mensagens</label>
             </div>
         </div>
 
-        <!-- Botões de Ação -->
-        <div class="config-card" style="text-align: center;">
-            <button type="button" class="test-connection" onclick="testConnection()">
-                🔍 Testar Conexão
-            </button>
-            
-            <button type="button" class="btn-config btn-primary" onclick="saveConfig()">
-                💾 Salvar Configuração
-            </button>
-            
-            <a class="btn-config btn-secondary" href="/admin">
-                ↩️ Cancelar
-            </a>
+        <!-- Botões -->
+        <div class="config-card" style="text-align:center;">
+            <button class="test-connection" onclick="testConnection()">🔍 Testar Conexão</button>
+            <button class="btn-config" onclick="saveConfig()">💾 Salvar</button>
+            <a class="btn-config btn-secondary" href="/admin">↩️ Cancelar</a>
         </div>
 
-        <!-- Logs de Teste -->
+        <!-- Log -->
         <div class="config-card">
             <h2>📝 Log de Teste</h2>
-            <div id="test-log" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+            <div id="test-log" style="background:#f8f9fa; border:1px solid #dee2e6; border-radius:4px; padding:10px; height:150px; overflow-y:auto; font-family:monospace;">
                 Pronto para testar conexão...
             </div>
         </div>
     </div>
 
+    <script>
+        const tlsCheckbox = document.getElementById('tls_enabled');
+        const tlsSection = document.getElementById('tls-section');
+        const certSelect = document.getElementById('ca_certificate');
+        const certUploadSection = document.getElementById('cert-upload-section');
 
-            document.getElementById('cert-file').addEventListener('change', handleCertUpload);
-            
-            // Drag and drop para certificado
-            const certUpload = document.querySelector('.cert-upload');
+        tlsCheckbox.addEventListener('change', () => {
+            tlsSection.classList.toggle('hidden', !tlsCheckbox.checked);
+        });
 
+        certSelect.addEventListener('change', () => {
+            certUploadSection.classList.toggle('hidden', certSelect.value !== '/spiffs/custom_ca.pem');
+        });
 
+        function testConnection() {
+            const log = document.getElementById('test-log');
+            log.innerHTML += "<br>⏳ Testando conexão com broker...";
+            setTimeout(() => {
+                log.innerHTML += "<br>✅ Conexão de teste simulada (implementar backend real).";
+            }, 2000);
+        }
+
+        function saveConfig() {
+            alert("💾 Configuração salva com sucesso (simulado).");
+        }
     </script>
 </body>
 </html>

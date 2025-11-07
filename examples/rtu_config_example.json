@@ -1,0 +1,10 @@
+{
+  "uart_port": 2,
+  "baud_rate": 19200,
+  "slave_address": 1,
+  "parity": 1,
+  "databits": 8,
+  "stopbits": 1,
+  "timeout": 1000,
+  "description": "Configuração RTU - Salva em /data/config/rtu_config.json"
+}

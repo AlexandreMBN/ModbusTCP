@@ -595,31 +595,45 @@ void start_wifi_ap() {
     char ap_password[64] = "12345678";  // Valor padrão
     char ap_ip[16] = "192.168.4.1";    // Valor padrão
     
-    // Tentar carregar do NVS
-    nvs_handle_t nvs_handle;
-    esp_err_t nvs_err = nvs_open("ap_config", NVS_READONLY, &nvs_handle);
-    if (nvs_err == ESP_OK) {
-        size_t required_size = sizeof(ap_ssid);
-        esp_err_t ssid_err = nvs_get_str(nvs_handle, "ssid", ap_ssid, &required_size);
-        
-        required_size = sizeof(ap_password);
-        esp_err_t pwd_err = nvs_get_str(nvs_handle, "password", ap_password, &required_size);
-        
-        required_size = sizeof(ap_ip);
-        esp_err_t ip_err = nvs_get_str(nvs_handle, "ip", ap_ip, &required_size);
-        
-        nvs_close(nvs_handle);
-        
-        if (ssid_err == ESP_OK && pwd_err == ESP_OK && ip_err == ESP_OK) {
-            ESP_LOGI(TAG, "Configurações do AP carregadas do NVS:");
-            ESP_LOGI(TAG, "  SSID: %s", ap_ssid);
-            ESP_LOGI(TAG, "  Password: %s", ap_password);
-            ESP_LOGI(TAG, "  IP: %s", ap_ip);
-        } else {
-            ESP_LOGW(TAG, "Algumas configurações do AP não encontradas no NVS, usando padrões");
-        }
+    // 🆕 PRIORIDADE 1: Tentar carregar do arquivo JSON primeiro
+    ap_config_t ap_config_json;
+    if (load_ap_config(&ap_config_json) == ESP_OK) {
+        ESP_LOGI(TAG, "✅ Configurações AP carregadas do arquivo JSON:");
+        strncpy(ap_ssid, ap_config_json.ssid, sizeof(ap_ssid)-1);
+        strncpy(ap_password, ap_config_json.password, sizeof(ap_password)-1);
+        strncpy(ap_ip, ap_config_json.ip, sizeof(ap_ip)-1);
+        ESP_LOGI(TAG, "  SSID: %s", ap_ssid);
+        ESP_LOGI(TAG, "  Password: %s", ap_password);
+        ESP_LOGI(TAG, "  IP: %s", ap_ip);
     } else {
-        ESP_LOGW(TAG, "Não foi possível abrir NVS para configurações do AP, usando padrões");
+        ESP_LOGI(TAG, "📂 Arquivo JSON não encontrado, tentando NVS...");
+        
+        // FALLBACK: Tentar carregar do NVS
+        nvs_handle_t nvs_handle;
+        esp_err_t nvs_err = nvs_open("ap_config", NVS_READONLY, &nvs_handle);
+        if (nvs_err == ESP_OK) {
+            size_t required_size = sizeof(ap_ssid);
+            esp_err_t ssid_err = nvs_get_str(nvs_handle, "ssid", ap_ssid, &required_size);
+            
+            required_size = sizeof(ap_password);
+            esp_err_t pwd_err = nvs_get_str(nvs_handle, "password", ap_password, &required_size);
+            
+            required_size = sizeof(ap_ip);
+            esp_err_t ip_err = nvs_get_str(nvs_handle, "ip", ap_ip, &required_size);
+            
+            nvs_close(nvs_handle);
+            
+            if (ssid_err == ESP_OK && pwd_err == ESP_OK && ip_err == ESP_OK) {
+                ESP_LOGI(TAG, "✅ Configurações do AP carregadas do NVS:");
+                ESP_LOGI(TAG, "  SSID: %s", ap_ssid);
+                ESP_LOGI(TAG, "  Password: %s", ap_password);
+                ESP_LOGI(TAG, "  IP: %s", ap_ip);
+            } else {
+                ESP_LOGW(TAG, "Algumas configurações do AP não encontradas no NVS, usando padrões");
+            }
+        } else {
+            ESP_LOGW(TAG, "Não foi possível abrir NVS para configurações do AP, usando padrões");
+        }
     }
     
     wifi_config_t ap_config = {
@@ -703,36 +717,55 @@ void start_wifi_ap() {
 
     // Verificar se há configurações WiFi salvas e tentar conectar automaticamente
     ESP_LOGI(TAG, "=== VERIFICANDO CONFIGURAÇÕES WIFI SALVAS ===");
-    nvs_handle_t wifi_nvs_handle;
-    esp_err_t wifi_nvs_err = nvs_open("wifi_config", NVS_READONLY, &wifi_nvs_handle);
-    if (wifi_nvs_err == ESP_OK) {
-        char saved_ssid[64] = "";
-        char saved_password[64] = "";
-        size_t required_size = sizeof(saved_ssid);
-        
-        esp_err_t ssid_err = nvs_get_str(wifi_nvs_handle, "wifi_ssid", saved_ssid, &required_size);
-        required_size = sizeof(saved_password);
-        esp_err_t pwd_err = nvs_get_str(wifi_nvs_handle, "wifi_password", saved_password, &required_size);
-        
-        nvs_close(wifi_nvs_handle);
-        
-        if (ssid_err == ESP_OK && strlen(saved_ssid) > 0) {
-            ESP_LOGI(TAG, "*** CONFIGURAÇÃO WIFI ENCONTRADA ***");
-            ESP_LOGI(TAG, "  SSID salvo: %s", saved_ssid);
-            ESP_LOGI(TAG, "  Password length: %d", strlen(saved_password));
-            ESP_LOGI(TAG, "*** MODO DUAL ATIVO: AP + STA ***");
-            ESP_LOGI(TAG, "  AP ativo em: %s (SSID: %s)", ap_ip, ap_ssid);
-            ESP_LOGI(TAG, "  Tentando conectar STA à: %s", saved_ssid);
-            
-            // Conectar automaticamente à rede salva
-            wifi_connect(saved_ssid, saved_password);
-        } else {
-            ESP_LOGI(TAG, "*** NENHUMA CONFIGURAÇÃO WIFI SALVA ***");
-            ESP_LOGI(TAG, "*** MODO AP APENAS ***");
-            ESP_LOGI(TAG, "  AP ativo em: %s (SSID: %s)", ap_ip, ap_ssid);
-        }
+    
+    char saved_ssid[64] = "";
+    char saved_password[64] = "";
+    bool config_found = false;
+    
+    // 🆕 PRIORIDADE 1: Tentar carregar do arquivo JSON primeiro
+    sta_config_t sta_config_json;
+    if (load_sta_config(&sta_config_json) == ESP_OK) {
+        ESP_LOGI(TAG, "✅ Configurações STA carregadas do arquivo JSON:");
+        strncpy(saved_ssid, sta_config_json.ssid, sizeof(saved_ssid)-1);
+        strncpy(saved_password, sta_config_json.password, sizeof(saved_password)-1);
+        ESP_LOGI(TAG, "  SSID: %s", saved_ssid);
+        ESP_LOGI(TAG, "  Password length: %d", strlen(saved_password));
+        config_found = true;
     } else {
-        ESP_LOGI(TAG, "*** NVS WIFI NÃO ACESSÍVEL ***");
+        ESP_LOGI(TAG, "📂 Arquivo STA JSON não encontrado, tentando NVS...");
+        
+        // FALLBACK: Tentar carregar do NVS
+        nvs_handle_t wifi_nvs_handle;
+        esp_err_t wifi_nvs_err = nvs_open("wifi_config", NVS_READONLY, &wifi_nvs_handle);
+        if (wifi_nvs_err == ESP_OK) {
+            size_t required_size = sizeof(saved_ssid);
+            
+            esp_err_t ssid_err = nvs_get_str(wifi_nvs_handle, "wifi_ssid", saved_ssid, &required_size);
+            required_size = sizeof(saved_password);
+            esp_err_t pwd_err = nvs_get_str(wifi_nvs_handle, "wifi_password", saved_password, &required_size);
+            
+            nvs_close(wifi_nvs_handle);
+            
+            if (ssid_err == ESP_OK && strlen(saved_ssid) > 0) {
+                ESP_LOGI(TAG, "✅ Configurações STA carregadas do NVS:");
+                ESP_LOGI(TAG, "  SSID: %s", saved_ssid);
+                ESP_LOGI(TAG, "  Password length: %d", strlen(saved_password));
+                config_found = true;
+            }
+        }
+    }
+    
+    if (config_found && strlen(saved_ssid) > 0) {
+        
+        ESP_LOGI(TAG, "*** CONFIGURAÇÃO WIFI ENCONTRADA ***");
+        ESP_LOGI(TAG, "*** MODO DUAL ATIVO: AP + STA ***");
+        ESP_LOGI(TAG, "  AP ativo em: %s (SSID: %s)", ap_ip, ap_ssid);
+        ESP_LOGI(TAG, "  Tentando conectar STA à: %s", saved_ssid);
+        
+        // Conectar automaticamente à rede salva
+        wifi_connect(saved_ssid, saved_password);
+    } else {
+        ESP_LOGI(TAG, "*** NENHUMA CONFIGURAÇÃO WIFI SALVA ***");
         ESP_LOGI(TAG, "*** MODO AP APENAS ***");
         ESP_LOGI(TAG, "  AP ativo em: %s (SSID: %s)", ap_ip, ap_ssid);
     }
@@ -845,7 +878,19 @@ void wifi_connect(const char* ssid, const char* password) {
 
     // Aplica IP estático automaticamente, se existir configuração
     char ip[16] = "", mask[16] = "", gw[16] = "", dns[16] = "";
-    read_network_config(ip, sizeof(ip), mask, sizeof(mask), gw, sizeof(gw), dns, sizeof(dns));
+    network_config_t net_config;
+    if (load_network_config(&net_config) == ESP_OK) {
+        strncpy(ip, net_config.ip, sizeof(ip)-1);
+        strncpy(mask, net_config.mask, sizeof(mask)-1);
+        strncpy(gw, net_config.gateway, sizeof(gw)-1);
+        strncpy(dns, net_config.dns, sizeof(dns)-1);
+        ip[sizeof(ip)-1] = '\0';
+        mask[sizeof(mask)-1] = '\0';
+        gw[sizeof(gw)-1] = '\0';
+        dns[sizeof(dns)-1] = '\0';
+    } else {
+        ip[0] = mask[0] = gw[0] = dns[0] = '\0';
+    }
     if (strlen(ip) > 0 && strlen(mask) > 0 && strlen(gw) > 0) {
         ESP_LOGI(TAG, "Aplicando IP estático salvo em network_config.json");
         wifi_apply_static_ip(ip, mask, gw, dns);

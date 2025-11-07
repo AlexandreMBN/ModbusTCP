@@ -8,15 +8,15 @@ set(priv_include_dirs
     freemodbus/modbus
     freemodbus/modbus/functions
     freemodbus/modbus/rtu
-    # freemodbus/modbus/tcp
+    freemodbus/modbus/tcp
     # freemodbus/modbus/ascii
     freemodbus/modbus/include
     freemodbus/serial_slave/port
     freemodbus/serial_slave/modbus_controller
     # freemodbus/serial_master/port
     # freemodbus/serial_master/modbus_controller
-    # freemodbus/tcp_slave/port
-    # freemodbus/tcp_slave/modbus_controller
+    freemodbus/tcp_slave/port
+    freemodbus/tcp_slave/modbus_controller
     # freemodbus/tcp_master/port
     # freemodbus/tcp_master/modbus_controller
 )
@@ -49,29 +49,31 @@ file(GLOB_RECURSE priv_srcs
     "freemodbus/modbus/functions/mbfuncother.c"
     "freemodbus/modbus/rtu/mbrtu.c"
     "freemodbus/modbus/rtu/mbcrc.c"
+    "freemodbus/modbus/tcp/mbtcp.c"
     "freemodbus/common/esp_modbus_slave_serial.c"
     "freemodbus/port/*.c"
     # Portabilidade
     "freemodbus/port/port.c"
 
-    # Parte “common” necessária
+    # Parte "common" necessária
     "freemodbus/common/esp_modbus_slave.c"
+    "freemodbus/common/esp_modbus_slave_tcp.c"
 
     # Controlador RTU Slave
     "freemodbus/serial_slave/port/port_serial_slave.c"
     "freemodbus/serial_slave/modbus_controller/mbc_serial_slave.c"
+    
+    # TCP slave controller (enable tcp slave sources)
+    "freemodbus/tcp_slave/modbus_controller/mbc_tcp_slave.c"
+    "freemodbus/tcp_slave/port/port_tcp_slave.c"
 
-
+    # Application-level TCP wrapper (implementation provided in lib)
+    "${CMAKE_SOURCE_DIR}/lib/ModbusTcpSlave/src/modbus_tcp_slave.c"
 
 )
 
 idf_component_register(
     SRCS ${priv_srcs}
-    INCLUDE_DIRS ${priv_include_dirs}
-    REQUIRES driver freertos
-    REQUIRES driver freertos esp_timer
+    INCLUDE_DIRS ${priv_include_dirs} "${CMAKE_SOURCE_DIR}/lib/ModbusTcpSlave/include"
+    REQUIRES driver freertos esp_timer esp_netif
 )
-
-    
-
-    

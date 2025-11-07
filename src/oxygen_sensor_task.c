@@ -11,6 +11,9 @@
 #include "oxygen_sensor_task.h"
 #include "mqtt_client_task.h"
 
+// ========== NOVO: SISTEMA DE FILAS ==========
+#include "queue_manager.h"  // Para envio de dados via filas
+
 #define LED_GPIO_PIN    GPIO_NUM_2  // GPIO2, commonly used for onboard LED on ESP32
 
 #define KP				1.0f //Era 20 em 21/01/2021
@@ -83,8 +86,8 @@ void sonda_control_task(void *pvParameters) {
 		controle_2_pwm(output);
         if ((erro < 125) && (erro > -125)){
             lambdaValue = cj125_get_lambda(spi_cj125_handle, adc1_handle);
-            uint16_t lambdaValueEscala = adjust_adc_result(lambdaValue);
-            o2Percent = cj125_o2_calc(lambdaValueEscala);//Cálculo do %O2
+            
+            o2Percent = cj125_o2_calc(lambdaValue);//Cálculo do %O2
 
         }else{
 
@@ -99,13 +102,37 @@ void sonda_control_task(void *pvParameters) {
         extern volatile uint16_t sonda_o2Percent_sync;
         extern volatile uint32_t sonda_output_sync;
         
-        // Sincroniza dados (thread-safe)
+        // Sincroniza dados (thread-safe) - MÉTODO ANTIGO (mantido para compatibilidade)
         sonda_heatValue_sync = heatValue;
         sonda_lambdaValue_sync = lambdaValue;
         sonda_heatRef_sync = heatRef;
         sonda_lambdaRef_sync = lambdaRef;
-        sonda_o2Percent_sync = o2Percent;
+        sonda_o2Percent_sync = o2Percent;  // ← Este será substituído pela fila gradualmente
         sonda_output_sync = output;
+        
+        // ========== NOVO: ENVIO VIA FILA (MÉTODO MODERNO) ==========
+        // OTIMIZAÇÃO: Envia para fila apenas a cada 100ms (10x menos frequente)
+        // Isso evita sobrecarregar a fila mantendo o PID funcionando normalmente
+        static int queue_counter = 0;
+        queue_counter++;
+        
+        if (queue_counter >= 50) {  // A cada 50 iterações (500ms = meio segundo)
+            queue_counter = 0;
+            
+            // 🔍 DEBUG: Verifica estado da fila antes de enviar
+            uint32_t pending = queue_get_o2_pending_count();
+            ESP_LOGI(TAG, "🔍 Tentando enviar O2=%d%% (fila tem %lu msgs)", 
+                     o2Percent, (unsigned long)pending);
+            
+            // Envia dados de O2 para outras tasks via fila thread-safe
+            esp_err_t queue_result = queue_send_o2_data(o2Percent, TASK_ID_SONDA);
+            if (queue_result != ESP_OK) {
+                // Se a fila falhar, os dados ainda estarão nas variáveis globais
+                ESP_LOGW(TAG, "❌ Fila O2 FALHOU: %s (usando fallback)", esp_err_to_name(queue_result));
+            } else {
+                ESP_LOGI(TAG, "✅ Dados O2 enviados via fila: %d%% (a cada 500ms)", o2Percent);
+            }
+        }
         // // integral = integral + erro*DT;
 	    // output=KP*erro + KI*integral;
 

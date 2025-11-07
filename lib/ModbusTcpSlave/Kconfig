@@ -1,0 +1,112 @@
+menu "ModbusTCP Slave Library Configuration"
+
+    config MODBUS_TCP_SLAVE_DEFAULT_PORT
+        int "Default Modbus TCP port"
+        default 502
+        range 1 65535
+        help
+            Default port number for Modbus TCP server.
+
+    config MODBUS_TCP_SLAVE_MAX_CONNECTIONS
+        int "Maximum TCP connections"
+        default 5
+        range 1 20
+        help
+            Maximum number of simultaneous TCP connections.
+
+    config MODBUS_TCP_SLAVE_CONNECTION_TIMEOUT
+        int "Connection timeout (seconds)"
+        default 20
+        range 5 300
+        help
+            TCP connection timeout in seconds.
+
+    config MODBUS_TCP_SLAVE_DEFAULT_SLAVE_ID
+        int "Default Slave ID"
+        default 1
+        range 1 247
+        help
+            Default Modbus slave ID.
+
+    config MODBUS_TCP_SLAVE_QUEUE_SIZE
+        int "Event queue size"
+        default 10
+        range 5 50
+        help
+            Size of the internal event queue.
+
+    config MODBUS_TCP_SLAVE_STACK_SIZE
+        int "Task stack size"
+        default 4096
+        range 2048 16384
+        help
+            Stack size for the Modbus TCP task.
+
+    config MODBUS_TCP_SLAVE_TASK_PRIORITY
+        int "Task priority"
+        default 10
+        range 1 24
+        help
+            Priority of the Modbus TCP task.
+
+    menu "Register Configuration"
+
+        config MODBUS_TCP_SLAVE_HOLDING_REG_COUNT
+            int "Holding registers count"
+            default 8
+            range 1 100
+            help
+                Number of holding registers (read/write).
+
+        config MODBUS_TCP_SLAVE_INPUT_REG_COUNT
+            int "Input registers count"
+            default 8
+            range 1 100
+            help
+                Number of input registers (read only).
+
+        config MODBUS_TCP_SLAVE_COIL_COUNT
+            int "Coils count"
+            default 16
+            range 1 100
+            help
+                Number of coils (read/write bits).
+
+        config MODBUS_TCP_SLAVE_DISCRETE_INPUT_COUNT
+            int "Discrete inputs count"
+            default 8
+            range 1 100
+            help
+                Number of discrete inputs (read only bits).
+
+    endmenu
+
+    menu "Advanced Configuration"
+
+        config MODBUS_TCP_SLAVE_ENABLE_CALLBACKS
+            bool "Enable callback system"
+            default y
+            help
+                Enable the callback system for register writes and connection events.
+
+        config MODBUS_TCP_SLAVE_THREAD_SAFE
+            bool "Enable thread safety"
+            default y
+            help
+                Enable mutex protection for thread-safe operations.
+
+        config MODBUS_TCP_SLAVE_DEBUG_ENABLE
+            bool "Enable debug logging"
+            default n
+            help
+                Enable detailed debug logging for troubleshooting.
+
+        config MODBUS_TCP_SLAVE_STATISTICS
+            bool "Enable connection statistics"
+            default y
+            help
+                Enable tracking of connection statistics and counters.
+
+    endmenu
+
+endmenu

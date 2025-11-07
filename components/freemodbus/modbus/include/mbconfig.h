@@ -42,7 +42,11 @@
 
 
 #include <inttypes.h>  // needs to be included for default system types (such as PRIxx)
+#if __has_include("config_fmb.h")
+#include "config_fmb.h"
+#else
 #include "sdkconfig.h" // for KConfig options
+#endif
 
 #if __has_include("esp_idf_version.h")
 #include "esp_idf_version.h"

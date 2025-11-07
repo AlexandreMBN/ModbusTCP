@@ -1,0 +1,10 @@
+{
+  "broker_url": "mqtt://test.mosquitto.org",
+  "client_id": "ESP32_TestClient",
+  "username": "",
+  "password": "",
+  "port": 1883,
+  "enabled": true,
+  "qos": 1,
+  "keep_alive": 60
+}
