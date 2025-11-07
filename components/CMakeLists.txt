@@ -74,6 +74,6 @@ file(GLOB_RECURSE priv_srcs
 
 idf_component_register(
     SRCS ${priv_srcs}
-    INCLUDE_DIRS ${priv_include_dirs} "${CMAKE_SOURCE_DIR}/lib/ModbusTcpSlave/include"
+    INCLUDE_DIRS ${priv_include_dirs} "${CMAKE_SOURCE_DIR}/lib/ModbusTcpSlave/include" "${CMAKE_SOURCE_DIR}/include"
     REQUIRES driver freertos esp_timer esp_netif
 )

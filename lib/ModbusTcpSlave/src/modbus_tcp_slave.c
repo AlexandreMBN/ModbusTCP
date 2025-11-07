@@ -11,6 +11,9 @@
 #include "freertos/semphr.h"
 #include "string.h"
 
+// Mapear diretamente os registradores globais usados pelo RTU
+#include "modbus_params.h"
+
 // Incluir os headers do FreeModbus
 #include "mbcontroller.h"
 #include "esp_modbus_common.h"
@@ -78,7 +81,7 @@ static modbus_tcp_instance_t* get_instance(modbus_tcp_handle_t handle) {
 
 // Configuração inicial dos registros
 static void setup_reg_data(modbus_tcp_instance_t *instance) {
-    // Discrete Inputs
+    // Discrete Inputs (mantidos locais - não há equivalentes globais definidos)
     instance->discrete_regs.discrete_input0 = 1;
     instance->discrete_regs.discrete_input1 = 0;
     instance->discrete_regs.discrete_input2 = 1;
@@ -88,29 +91,29 @@ static void setup_reg_data(modbus_tcp_instance_t *instance) {
     instance->discrete_regs.discrete_input6 = 1;
     instance->discrete_regs.discrete_input7 = 0;
 
-    // Holding Registers
-    instance->holding_regs.holding_data0 = 1.34f;
-    instance->holding_regs.holding_data1 = 2.56f;
-    instance->holding_regs.holding_data2 = 3.78f;
-    instance->holding_regs.holding_data3 = 4.90f;
-    instance->holding_regs.holding_data4 = 5.67f;
-    instance->holding_regs.holding_data5 = 6.78f;
-    instance->holding_regs.holding_data6 = 7.79f;
-    instance->holding_regs.holding_data7 = 8.80f;
+    // Holding Registers base (0-7) - usar memória global compartilhada
+    holding_reg_params.holding_data0 = 1.34f;
+    holding_reg_params.holding_data1 = 2.56f;
+    holding_reg_params.holding_data2 = 3.78f;
+    holding_reg_params.holding_data3 = 4.90f;
+    holding_reg_params.holding_data4 = 5.67f;
+    holding_reg_params.holding_data5 = 6.78f;
+    holding_reg_params.holding_data6 = 7.79f;
+    holding_reg_params.holding_data7 = 8.80f;
 
-    // Coils
-    instance->coil_regs.coils_port0 = 0x55;
-    instance->coil_regs.coils_port1 = 0xAA;
+    // Coils - usar memória global compartilhada
+    coil_reg_params.coils_port0 = 0x55;
+    coil_reg_params.coils_port1 = 0xAA;
 
-    // Input Registers
-    instance->input_regs.input_data0 = 1.12f;
-    instance->input_regs.input_data1 = 2.34f;
-    instance->input_regs.input_data2 = 3.56f;
-    instance->input_regs.input_data3 = 4.78f;
-    instance->input_regs.input_data4 = 1.12f;
-    instance->input_regs.input_data5 = 2.34f;
-    instance->input_regs.input_data6 = 3.56f;
-    instance->input_regs.input_data7 = 4.78f;
+    // Input Registers base (0-7) - usar memória global compartilhada
+    input_reg_params.input_data0 = 1.12f;
+    input_reg_params.input_data1 = 2.34f;
+    input_reg_params.input_data2 = 3.56f;
+    input_reg_params.input_data3 = 4.78f;
+    input_reg_params.input_data4 = 1.12f;
+    input_reg_params.input_data5 = 2.34f;
+    input_reg_params.input_data6 = 3.56f;
+    input_reg_params.input_data7 = 4.78f;
 }
 
 // Task de operação do Modbus (baseada no código original)
@@ -305,10 +308,10 @@ esp_err_t modbus_tcp_slave_start(modbus_tcp_handle_t handle) {
     // Configurar áreas de registros
     mb_register_area_descriptor_t reg_area;
 
-    // Holding Registers - Area 0
+    // Holding Registers - Area 0 (usar memória global do RTU)
     reg_area.type = MB_PARAM_HOLDING;
     reg_area.start_offset = MB_REG_HOLDING_START_AREA0;
-    reg_area.address = (void*)&instance->holding_regs.holding_data0;
+    reg_area.address = (void*)&holding_reg_params.holding_data0;
     reg_area.size = (MB_REG_HOLDING_START_AREA1 - MB_REG_HOLDING_START_AREA0) << 1;
     err = mbc_slave_set_descriptor(reg_area);
     if (err != ESP_OK) {
@@ -318,10 +321,10 @@ esp_err_t modbus_tcp_slave_start(modbus_tcp_handle_t handle) {
         return err;
     }
 
-    // Holding Registers - Area 1
+    // Holding Registers - Area 1 (usar memória global do RTU)
     reg_area.type = MB_PARAM_HOLDING;
     reg_area.start_offset = MB_REG_HOLDING_START_AREA1;
-    reg_area.address = (void*)&instance->holding_regs.holding_data4;
+    reg_area.address = (void*)&holding_reg_params.holding_data4;
     reg_area.size = sizeof(float) << 2;
     err = mbc_slave_set_descriptor(reg_area);
     if (err != ESP_OK) {
@@ -331,10 +334,10 @@ esp_err_t modbus_tcp_slave_start(modbus_tcp_handle_t handle) {
         return err;
     }
 
-    // Input Registers - Area 0
+    // Input Registers - Area 0 (usar memória global do RTU)
     reg_area.type = MB_PARAM_INPUT;
     reg_area.start_offset = MB_REG_INPUT_START_AREA0;
-    reg_area.address = (void*)&instance->input_regs.input_data0;
+    reg_area.address = (void*)&input_reg_params.input_data0;
     reg_area.size = sizeof(float) << 2;
     err = mbc_slave_set_descriptor(reg_area);
     if (err != ESP_OK) {
@@ -344,10 +347,10 @@ esp_err_t modbus_tcp_slave_start(modbus_tcp_handle_t handle) {
         return err;
     }
 
-    // Input Registers - Area 1
+    // Input Registers - Area 1 (usar memória global do RTU)
     reg_area.type = MB_PARAM_INPUT;
     reg_area.start_offset = MB_REG_INPUT_START_AREA1;
-    reg_area.address = (void*)&instance->input_regs.input_data4;
+    reg_area.address = (void*)&input_reg_params.input_data4;
     reg_area.size = sizeof(float) << 2;
     err = mbc_slave_set_descriptor(reg_area);
     if (err != ESP_OK) {
@@ -357,11 +360,11 @@ esp_err_t modbus_tcp_slave_start(modbus_tcp_handle_t handle) {
         return err;
     }
 
-    // Coils
+    // Coils (usar memória global do RTU)
     reg_area.type = MB_PARAM_COIL;
     reg_area.start_offset = MB_REG_COILS_START;
-    reg_area.address = (void*)&instance->coil_regs;
-    reg_area.size = sizeof(modbus_coil_regs_t);
+    reg_area.address = (void*)&coil_reg_params;
+    reg_area.size = sizeof(coil_reg_params_t);
     err = mbc_slave_set_descriptor(reg_area);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to set coils: %s", esp_err_to_name(err));
@@ -378,6 +381,124 @@ esp_err_t modbus_tcp_slave_start(modbus_tcp_handle_t handle) {
     err = mbc_slave_set_descriptor(reg_area);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to set discrete inputs: %s", esp_err_to_name(err));
+        instance->state = MODBUS_TCP_STATE_ERROR;
+        xSemaphoreGive(instance->mutex);
+        return err;
+    }
+
+    // Registrar áreas adicionais de Holding Registers
+    // REG 1000 - Configuração (3 registros) -> usa memória global compartilhada
+    reg_area.type = MB_PARAM_HOLDING;
+    reg_area.start_offset = REG_CONFIG_START;
+    reg_area.address = (void*)holding_reg1000_params.reg1000;
+    reg_area.size = REG_CONFIG_SIZE * sizeof(uint16_t);
+    err = mbc_slave_set_descriptor(reg_area);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set holding registers 1000: %s", esp_err_to_name(err));
+        instance->state = MODBUS_TCP_STATE_ERROR;
+        xSemaphoreGive(instance->mutex);
+        return err;
+    }
+
+    // REG 2000 - Data (1 registro) -> global reg2000
+    reg_area.type = MB_PARAM_HOLDING;
+    reg_area.start_offset = REG_DATA_START;
+    reg_area.address = (void*)reg2000;
+    reg_area.size = REG_DATA_SIZE * sizeof(uint16_t);
+    err = mbc_slave_set_descriptor(reg_area);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set holding registers 2000: %s", esp_err_to_name(err));
+        instance->state = MODBUS_TCP_STATE_ERROR;
+        xSemaphoreGive(instance->mutex);
+        return err;
+    }
+
+    // REG 3000 -> global reg3000
+    reg_area.type = MB_PARAM_HOLDING;
+    reg_area.start_offset = REG_3000_START;
+    reg_area.address = (void*)reg3000;
+    reg_area.size = REG_3000_SIZE * sizeof(uint16_t);
+    err = mbc_slave_set_descriptor(reg_area);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set holding registers 3000: %s", esp_err_to_name(err));
+        instance->state = MODBUS_TCP_STATE_ERROR;
+        xSemaphoreGive(instance->mutex);
+        return err;
+    }
+
+    // REG 4000 -> global reg4000
+    reg_area.type = MB_PARAM_HOLDING;
+    reg_area.start_offset = REG_4000_START;
+    reg_area.address = (void*)reg4000;
+    reg_area.size = REG_4000_SIZE * sizeof(uint16_t);
+    err = mbc_slave_set_descriptor(reg_area);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set holding registers 4000: %s", esp_err_to_name(err));
+        instance->state = MODBUS_TCP_STATE_ERROR;
+        xSemaphoreGive(instance->mutex);
+        return err;
+    }
+
+    // REG 5000 -> global reg5000
+    reg_area.type = MB_PARAM_HOLDING;
+    reg_area.start_offset = REG_5000_START;
+    reg_area.address = (void*)reg5000;
+    reg_area.size = REG_5000_SIZE * sizeof(uint16_t);
+    err = mbc_slave_set_descriptor(reg_area);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set holding registers 5000: %s", esp_err_to_name(err));
+        instance->state = MODBUS_TCP_STATE_ERROR;
+        xSemaphoreGive(instance->mutex);
+        return err;
+    }
+
+    // REG 6000 -> global reg6000
+    reg_area.type = MB_PARAM_HOLDING;
+    reg_area.start_offset = REG_6000_START;
+    reg_area.address = (void*)reg6000;
+    reg_area.size = REG_6000_SIZE * sizeof(uint16_t);
+    err = mbc_slave_set_descriptor(reg_area);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set holding registers 6000: %s", esp_err_to_name(err));
+        instance->state = MODBUS_TCP_STATE_ERROR;
+        xSemaphoreGive(instance->mutex);
+        return err;
+    }
+
+    // REG 7000 -> global reg7000
+    reg_area.type = MB_PARAM_HOLDING;
+    reg_area.start_offset = REG_7000_START;
+    reg_area.address = (void*)reg7000;
+    reg_area.size = REG_7000_SIZE * sizeof(uint16_t);
+    err = mbc_slave_set_descriptor(reg_area);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set holding registers 7000: %s", esp_err_to_name(err));
+        instance->state = MODBUS_TCP_STATE_ERROR;
+        xSemaphoreGive(instance->mutex);
+        return err;
+    }
+
+    // REG 8000 -> global reg8000
+    reg_area.type = MB_PARAM_HOLDING;
+    reg_area.start_offset = REG_8000_START;
+    reg_area.address = (void*)reg8000;
+    reg_area.size = REG_8000_SIZE * sizeof(uint16_t);
+    err = mbc_slave_set_descriptor(reg_area);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set holding registers 8000: %s", esp_err_to_name(err));
+        instance->state = MODBUS_TCP_STATE_ERROR;
+        xSemaphoreGive(instance->mutex);
+        return err;
+    }
+
+    // REG 9000 - Unit Specs -> global reg9000
+    reg_area.type = MB_PARAM_HOLDING;
+    reg_area.start_offset = REG_UNITSPECS_START;
+    reg_area.address = (void*)reg9000;
+    reg_area.size = REG_UNITSPECS_SIZE * sizeof(uint16_t);
+    err = mbc_slave_set_descriptor(reg_area);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set holding registers 9000: %s", esp_err_to_name(err));
         instance->state = MODBUS_TCP_STATE_ERROR;
         xSemaphoreGive(instance->mutex);
         return err;
@@ -496,36 +617,99 @@ modbus_tcp_state_t modbus_tcp_slave_get_state(modbus_tcp_handle_t handle) {
 
 esp_err_t modbus_tcp_set_holding_reg_float(modbus_tcp_handle_t handle, uint16_t addr, float value) {
     modbus_tcp_instance_t *instance = get_instance(handle);
-    if (!instance || addr > 7) {
+    if (!instance) {
         return ESP_ERR_INVALID_ARG;
     }
 
-    if (xSemaphoreTake(instance->mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
-        return ESP_ERR_TIMEOUT;
+    // Endereços básicos (0-7) armazenados como float - usar memória global compartilhada
+    if (addr <= 7) {
+        if (xSemaphoreTake(instance->mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
+            return ESP_ERR_TIMEOUT;
+        }
+        float *reg_ptr = (float*)&holding_reg_params;
+        reg_ptr[addr] = value;
+        xSemaphoreGive(instance->mutex);
+        return ESP_OK;
     }
 
-    float *reg_ptr = (float*)&instance->holding_regs;
-    reg_ptr[addr] = value;
-
-    xSemaphoreGive(instance->mutex);
-    return ESP_OK;
+    // Endereços estendidos - escrever diretamente nos arrays globais (uint16_t)
+    uint16_t as_u16 = (uint16_t)value;
+    if (addr >= REG_CONFIG_START && addr < REG_CONFIG_START + REG_CONFIG_SIZE) {
+        holding_reg1000_params.reg1000[addr - REG_CONFIG_START] = as_u16;
+        return ESP_OK;
+    } else if (addr >= REG_DATA_START && addr < REG_DATA_START + REG_DATA_SIZE) {
+        reg2000[addr - REG_DATA_START] = as_u16;
+        return ESP_OK;
+    } else if (addr >= REG_3000_START && addr < REG_3000_START + REG_3000_SIZE) {
+        reg3000[addr - REG_3000_START] = as_u16;
+        return ESP_OK;
+    } else if (addr >= REG_4000_START && addr < REG_4000_START + REG_4000_SIZE) {
+        reg4000[addr - REG_4000_START] = as_u16;
+        return ESP_OK;
+    } else if (addr >= REG_5000_START && addr < REG_5000_START + REG_5000_SIZE) {
+        reg5000[addr - REG_5000_START] = as_u16;
+        return ESP_OK;
+    } else if (addr >= REG_6000_START && addr < REG_6000_START + REG_6000_SIZE) {
+        reg6000[addr - REG_6000_START] = as_u16;
+        return ESP_OK;
+    } else if (addr >= REG_7000_START && addr < REG_7000_START + REG_7000_SIZE) {
+        reg7000[addr - REG_7000_START] = as_u16;
+        return ESP_OK;
+    } else if (addr >= REG_8000_START && addr < REG_8000_START + REG_8000_SIZE) {
+        reg8000[addr - REG_8000_START] = as_u16;
+        return ESP_OK;
+    } else if (addr >= REG_UNITSPECS_START && addr < REG_UNITSPECS_START + REG_UNITSPECS_SIZE) {
+        reg9000[addr - REG_UNITSPECS_START] = as_u16;
+        return ESP_OK;
+    }
+    return ESP_ERR_INVALID_ARG;
 }
 
 esp_err_t modbus_tcp_get_holding_reg_float(modbus_tcp_handle_t handle, uint16_t addr, float *value) {
     modbus_tcp_instance_t *instance = get_instance(handle);
-    if (!instance || !value || addr > 7) {
+    if (!instance || !value) {
         return ESP_ERR_INVALID_ARG;
     }
 
-    if (xSemaphoreTake(instance->mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
-        return ESP_ERR_TIMEOUT;
+    if (addr <= 7) {
+        if (xSemaphoreTake(instance->mutex, pdMS_TO_TICKS(100)) != pdTRUE) {
+            return ESP_ERR_TIMEOUT;
+        }
+        float *reg_ptr = (float*)&holding_reg_params;
+        *value = reg_ptr[addr];
+        xSemaphoreGive(instance->mutex);
+        return ESP_OK;
     }
 
-    float *reg_ptr = (float*)&instance->holding_regs;
-    *value = reg_ptr[addr];
-
-    xSemaphoreGive(instance->mutex);
-    return ESP_OK;
+    if (addr >= REG_CONFIG_START && addr < REG_CONFIG_START + REG_CONFIG_SIZE) {
+        *value = (float)holding_reg1000_params.reg1000[addr - REG_CONFIG_START];
+        return ESP_OK;
+    } else if (addr >= REG_DATA_START && addr < REG_DATA_START + REG_DATA_SIZE) {
+        *value = (float)reg2000[addr - REG_DATA_START];
+        return ESP_OK;
+    } else if (addr >= REG_3000_START && addr < REG_3000_START + REG_3000_SIZE) {
+        *value = (float)reg3000[addr - REG_3000_START];
+        return ESP_OK;
+    } else if (addr >= REG_4000_START && addr < REG_4000_START + REG_4000_SIZE) {
+        *value = (float)reg4000[addr - REG_4000_START];
+        return ESP_OK;
+    } else if (addr >= REG_5000_START && addr < REG_5000_START + REG_5000_SIZE) {
+        *value = (float)reg5000[addr - REG_5000_START];
+        return ESP_OK;
+    } else if (addr >= REG_6000_START && addr < REG_6000_START + REG_6000_SIZE) {
+        *value = (float)reg6000[addr - REG_6000_START];
+        return ESP_OK;
+    } else if (addr >= REG_7000_START && addr < REG_7000_START + REG_7000_SIZE) {
+        *value = (float)reg7000[addr - REG_7000_START];
+        return ESP_OK;
+    } else if (addr >= REG_8000_START && addr < REG_8000_START + REG_8000_SIZE) {
+        *value = (float)reg8000[addr - REG_8000_START];
+        return ESP_OK;
+    } else if (addr >= REG_UNITSPECS_START && addr < REG_UNITSPECS_START + REG_UNITSPECS_SIZE) {
+        *value = (float)reg9000[addr - REG_UNITSPECS_START];
+        return ESP_OK;
+    }
+    return ESP_ERR_INVALID_ARG;
 }
 
 esp_err_t modbus_tcp_set_input_reg_float(modbus_tcp_handle_t handle, uint16_t addr, float value) {
@@ -538,7 +722,7 @@ esp_err_t modbus_tcp_set_input_reg_float(modbus_tcp_handle_t handle, uint16_t ad
         return ESP_ERR_TIMEOUT;
     }
 
-    float *reg_ptr = (float*)&instance->input_regs;
+    float *reg_ptr = (float*)&input_reg_params;
     reg_ptr[addr] = value;
 
     xSemaphoreGive(instance->mutex);
@@ -555,7 +739,7 @@ esp_err_t modbus_tcp_get_input_reg_float(modbus_tcp_handle_t handle, uint16_t ad
         return ESP_ERR_TIMEOUT;
     }
 
-    float *reg_ptr = (float*)&instance->input_regs;
+    float *reg_ptr = (float*)&input_reg_params;
     *value = reg_ptr[addr];
 
     xSemaphoreGive(instance->mutex);
@@ -572,7 +756,7 @@ esp_err_t modbus_tcp_set_coil(modbus_tcp_handle_t handle, uint16_t addr, bool va
         return ESP_ERR_TIMEOUT;
     }
 
-    uint8_t *coil_ptr = (uint8_t*)&instance->coil_regs;
+    uint8_t *coil_ptr = (uint8_t*)&coil_reg_params;
     uint8_t byte_idx = addr / 8;
     uint8_t bit_idx = addr % 8;
     
@@ -596,7 +780,7 @@ esp_err_t modbus_tcp_get_coil(modbus_tcp_handle_t handle, uint16_t addr, bool *v
         return ESP_ERR_TIMEOUT;
     }
 
-    uint8_t *coil_ptr = (uint8_t*)&instance->coil_regs;
+    uint8_t *coil_ptr = (uint8_t*)&coil_reg_params;
     uint8_t byte_idx = addr / 8;
     uint8_t bit_idx = addr % 8;
     
