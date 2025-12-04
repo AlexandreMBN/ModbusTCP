@@ -7,25 +7,27 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <div>
-        <h1>📶 Escolha sua rede Wi-Fi</h1>
-        <p>🔄 Scan em andamento. Aguardando ~{{COUNTDOWN}}s</p>
-        <p>Esta página atualizará automaticamente quando o scan terminar.</p>
-        
-        <div>
-            <a href="/wifi_scan">🔄 Forçar scan</a>
-            <a href="/admin">⬅️ Voltar</a>
-        <div>
-            <div class="brand">
-                <div class="brand-main">
-                    <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
-                    <h2 class="brand-company">Infitech - Automação</h2>
-                </div>
-                <div class="brand-program">Programa: <strong>MCT-01</strong></div>
-            </div>
-            <h1>🔎 Escaneando WiFi</h1>
-        
-            <div>
+    <div class="brand">
+        <div class="brand-main">
+            <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+            <h2 class="brand-company">Infitech - Automação</h2>
+        </div>
+        <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+    </div>
+
+    <div class="config-card" style="margin-top: 10px; padding: 15px;">
+        <h1 style="margin-top:0;">Escaneando Redes Wi-Fi</h1>
+        <p>Scan em andamento. Aguardando ~<strong>{{COUNTDOWN}}</strong>s</p>
+        <p>Esta página atualizará automaticamente durante o processo de varredura.</p>
+
+        <div style="display:flex; gap:8px; margin-top:12px;">
+            <a class="btn-config btn-secondary" href="/wifi_scan">Forçar scan</a>
+            <a class="btn-config btn-secondary" href="/wifi_select">Selecionar Rede</a>
+            <a class="btn-config btn-secondary" href="/admin">Voltar</a>
+        </div>
+    </div>
+
+    <script src="/js/auto_reload.js"></script>
     <script src="/js/scripts.js"></script>
 </body>
 </html>

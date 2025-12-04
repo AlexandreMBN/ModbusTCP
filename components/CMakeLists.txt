@@ -8,15 +8,15 @@ set(priv_include_dirs
     freemodbus/modbus
     freemodbus/modbus/functions
     freemodbus/modbus/rtu
-    # freemodbus/modbus/tcp
+    freemodbus/modbus/tcp
     # freemodbus/modbus/ascii
     freemodbus/modbus/include
     freemodbus/serial_slave/port
     freemodbus/serial_slave/modbus_controller
     # freemodbus/serial_master/port
     # freemodbus/serial_master/modbus_controller
-    # freemodbus/tcp_slave/port
-    # freemodbus/tcp_slave/modbus_controller
+    freemodbus/tcp_slave/port
+    freemodbus/tcp_slave/modbus_controller
     # freemodbus/tcp_master/port
     # freemodbus/tcp_master/modbus_controller
 )
@@ -49,17 +49,30 @@ file(GLOB_RECURSE priv_srcs
     "freemodbus/modbus/functions/mbfuncother.c"
     "freemodbus/modbus/rtu/mbrtu.c"
     "freemodbus/modbus/rtu/mbcrc.c"
+    "freemodbus/modbus/tcp/mbtcp.c"
     "freemodbus/common/esp_modbus_slave_serial.c"
-    "freemodbus/port/*.c"
+    "freemodbus/common/esp_modbus_slave_tcp.c"
+    
     # Portabilidade
     "freemodbus/port/port.c"
+    "freemodbus/port/portevent.c"
+    "freemodbus/port/portevent_m.c"
+    "freemodbus/port/portother.c"
+    "freemodbus/port/portother_m.c"
+    "freemodbus/port/portserial.c"
+    "freemodbus/port/portserial_m.c"
+    "freemodbus/port/porttimer.c"
+    "freemodbus/port/porttimer_m.c"
 
-    # Parte “common” necessária
+    # Parte "common" necessária
     "freemodbus/common/esp_modbus_slave.c"
 
     # Controlador RTU Slave
-    "freemodbus/serial_slave/port/port_serial_slave.c"
     "freemodbus/serial_slave/modbus_controller/mbc_serial_slave.c"
+
+    # Controlador TCP Slave
+    "freemodbus/tcp_slave/port/port_tcp_slave.c"
+    "freemodbus/tcp_slave/modbus_controller/mbc_tcp_slave.c"
 
 
 
@@ -68,8 +81,17 @@ file(GLOB_RECURSE priv_srcs
 idf_component_register(
     SRCS ${priv_srcs}
     INCLUDE_DIRS ${priv_include_dirs}
-    REQUIRES driver freertos
-    REQUIRES driver freertos esp_timer
+    REQUIRES driver freertos esp_timer esp_netif lwip
+)
+
+# Habilita Modbus TCP com todas as configurações necessárias
+target_compile_definitions(${COMPONENT_LIB} PUBLIC
+    CONFIG_FMB_COMM_MODE_TCP_EN=1
+    MB_TCP_ENABLED=1
+    CONFIG_FMB_TCP_PORT_DEFAULT=502
+    CONFIG_FMB_TCP_PORT_MAX_CONN=5
+    CONFIG_FMB_TCP_CONNECTION_TOUT_SEC=20
+    CONFIG_FMB_TCP_UID_ENABLED=0
 )
 
     

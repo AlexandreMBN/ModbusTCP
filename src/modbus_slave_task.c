@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdint.h>
 #include "esp_modbus_slave.h"
 #include "modbus_params.h"
@@ -16,6 +16,9 @@
 #include <string.h>
 // Incluído para acesso às variáveis globais da sonda
 #include "globalvar.h"
+
+// ========== NOVO: SISTEMA DE FILAS ==========
+#include "queue_manager.h"  // Para receber dados via filas
 
 static const char *TAG = "MODBUS_SLAVE";
 
@@ -38,53 +41,62 @@ static void setup_registers(void) {
     holding_reg1000_params.reg1000[endereco] = 1;
     holding_reg1000_params.reg1000[paridade] = 0; // No parity
 
-    load_config(); // Carrega a configuração salva, se existir
+    // Valores padrão iniciais para todos os registradores
+    ESP_LOGI(TAG, "ANTES de load_config(): reg2000[dataValue] = %d", reg2000[dataValue]);
+    reg2000[dataValue] = 2100; // padrão
 
-    reg2000[dataValue] = 2100; // Inicializa o primeiro registrador de dados
+    reg3000[maxDac] = 3100;
+    reg3000[minDac] = 616;
 
-    reg3000[maxDac] = 3100; // Inicializa o primeiro registrador de dados
-    reg3000[minDac] = 616; // Inicializa o segundo registrador de
+    reg4000[lambdaValue] = 4100;
+    reg4000[lambdaRef] = 416;
+    reg4000[heatValue] = 5100;
+    reg4000[heatRef] = 516;
+    reg4000[output_mb] = 6100;
+    reg4000[PROBE_DEMAGED] = 0;
+    reg4000[PROBE_TEMP_OUT_OF_RANGE] = 0;
+    reg4000[COMPRESSOR_FAIL] = 0;
 
-    reg4000[lambdaValue] = 4100; // Inicializa o primeiro registrador de dados
-    reg4000[lambdaRef] = 416; // Inicializa o segundo registrador de dados
-    reg4000[heatValue] = 5100; // Inicializa o terceiro registrador de dados
-    reg4000[heatRef] = 516; // Inicializa o quarto registrador de dados
-    reg4000[output_mb] = 6100; // Inicializa o quinto registrador de dados
-    reg4000[PROBE_DEMAGED] = 616; // Inicializa o sexto registrador de dados
-    reg4000[PROBE_TEMP_OUT_OF_RANGE] = 7100; // Inicializa o sétimo registrador de dados
-    reg4000[COMPRESSOR_FAIL] = 716; // Inicializa o oitavo registrador de dados
+    reg5000[teste1] = 5100;
+    reg5000[teste2] = 516;
+    reg5000[teste3] = 6100;
+    reg5000[teste4] = 616;
 
-    reg5000[teste1] = 5100; // Inicializa o primeiro registrador de dados
-    reg5000[teste2] = 516; // Inicializa o segundo registrador de dados
-    reg5000[teste3] = 6100; // Inicializa o terceiro registrador de dados
-    reg5000[teste4] = 616; // Inicializa o quarto registrador de dados
+    reg6000[maxDac0] = 6100;
+    reg6000[forcaValorDAC] = 616;
+    reg6000[nada] = 7100;
+    reg6000[dACGain0] = 716;
+    reg6000[dACOffset0] = 8100;
 
-    reg6000[maxDac0] = 6100; // Inicializa o primeiro registrador de dados
-    reg6000[forcaValorDAC] = 616; // Inicializa o segundo registrador de
-    reg6000[nada] = 7100; // Inicializa o terceiro registrador de dados
-    reg6000[dACGain0] = 716; // Inicializa o quarto registrador de
-    reg6000[dACOffset0] = 8100; // Inicializa o quinto registrador de dados
+    reg9000[valorZero] = 9000;
+    reg9000[valorUm] = 9010;
+    reg9000[firmVerHi] = 9020;
+    reg9000[firmVerLo] = 9030;
+    reg9000[valorQuatro] = 9040;
+    reg9000[valorCinco] = 9050;
+    reg9000[lotnum0] = 9060;
+    reg9000[lotnum1] = 9070;
+    reg9000[lotnum2] = 9080;
+    reg9000[lotnum3] = 9090;
+    reg9000[lotnum4] = 9100;
+    reg9000[lotnum5] = 9110;
+    reg9000[wafnum] = 9120;
+    reg9000[coordx0] = 9130;
+    reg9000[coordx1] = 9140;
+    reg9000[coordy0] = 9150;
+    reg9000[coordy1] = 9160;
+    reg9000[valor17] = 9170;
+    reg9000[valor18] = 9170;
+    reg9000[valor19] = 9170;
 
-    reg9000[valorZero] = 9000; // Inicializa o primeiro registrador de dados
-    reg9000[valorUm] = 9010; // Inicializa o segundo registrador de dados
-    reg9000[firmVerHi] = 9020; // Inicializa o terceiro
-    reg9000[firmVerLo] = 9030; // Inicializa o quarto
-    reg9000[valorQuatro] = 9040; // Inicializa o quinto registrador de dados
-    reg9000[valorCinco] = 9050; // Inicializa o sexto   registrador de dados
-    reg9000[lotnum0] = 9060; // Inicializa o sétimo registrador de dados
-    reg9000[lotnum1] = 9070; // Inicializa o oitavo registrador de dados
-    reg9000[lotnum2] = 9080; // Inicializa o nono registrador de dados
-    reg9000[lotnum3] = 9090; // Inicializa o décimo registrador de dados  
-    reg9000[lotnum4] = 9100; // Inicializa o décimo primeiro registrador de dados
-    reg9000[lotnum5] = 9110; // Inicializa o décimo segundo registrador de dados
-    reg9000[wafnum] = 9120; // Inicializa o décimo terceiro registrador de dados
-    reg9000[coordx0] = 9130; // Inicializa o décimo quarto registrador de dados
-    reg9000[coordx1] = 9140; // Inicializa o décimo quinto registrador de dados
-    reg9000[coordy0] = 9150; // Inicializa o décimo sexto registrador de dados
-    reg9000[coordy1] = 9160; // Inicializa o décimo sétimo registrador de dados
-    reg9000[valor17] = 9170; // Inicializa o décimo oitavo registrador de dados
-    reg9000[valor18] = 9170; // Inicializa o décimo oitavo registrador de dados
-    reg9000[valor19] = 9170; // Inicializa o décimo oitavo registrador de dados
+    // Carrega a configuração salva e, se sucesso, sobrescreve defaults
+    esp_err_t config_result = load_config();
+    ESP_LOGI(TAG, "DEPOIS de load_config(): reg2000[dataValue] = %d", reg2000[dataValue]);
+
+    // Se falhou, mantém defaults já definidos
+    if (config_result != ESP_OK) {
+        ESP_LOGW(TAG, "Config não carregada, mantendo valores padrão");
+    }
 
 
 
@@ -98,6 +110,13 @@ void modbus_slave_task(void *pvParameters) {
     void* mbc_slave_handler = NULL;
 
     ESP_LOGI(TAG, "Modbus Slave Task starting...");
+
+    // ========== INICIALIZA MUTEX DE PROTEÇÃO DOS REGISTRADORES ==========
+    if (!modbus_mutex_init()) {
+        ESP_LOGE(TAG, "FATAL: Falha ao criar mutex de registradores!");
+        vTaskDelete(NULL);
+        return;
+    }
 
     // // Inicializa os registradores antes de registrar
     setup_registers();
@@ -265,8 +284,80 @@ void modbus_slave_task(void *pvParameters) {
     // Loop principal do Modbus
     for (;;) {
         
+        // ========== NOVO: RECEPÇÃO VIA FILA (MÉTODO MODERNO) ==========
+        // OTIMIZAÇÃO: Tenta processar TODAS as mensagens disponíveis na fila
+        // para evitar acúmulo e overflow
+        o2_queue_msg_t o2_msg;
+        esp_err_t queue_result = ESP_ERR_TIMEOUT;
+        int messages_processed = 0;
+        
+        // DEBUG: Verifica quantas mensagens estão na fila ANTES de processar
+        uint32_t pending_before = queue_get_o2_pending_count();
+        
+        // 🚨 FORÇA LOG SEMPRE para debug
+        ESP_LOGI(TAG, "MODBUS LOOP ativo: %lu msgs na fila", (unsigned long)pending_before);
+        
+        if (pending_before > 0) {
+            ESP_LOGI(TAG, "Processando %lu mensagens da fila...", (unsigned long)pending_before);
+        }
+        
+        // Processa até 5 mensagens por iteração ou até a fila ficar vazia
+        while (messages_processed < 5) {
+            queue_result = queue_receive_o2_data(&o2_msg);
+            if (queue_result != ESP_OK) {
+                ESP_LOGI(TAG, "Fila vazia ou erro: %s", esp_err_to_name(queue_result));
+                break; // Fila vazia
+            }
+            messages_processed++;
+            ESP_LOGI(TAG, "Mensagem %d processada: O2=%d%% (timestamp=%lu)", 
+                     messages_processed, o2_msg.o2_percent, o2_msg.timestamp);
+        }
+        
+        if (messages_processed > 0) {
+            // DADOS RECEBIDOS VIA FILA - Atualiza registrador com dados frescos (último valor)
+            ESP_LOGI(TAG, "SUCESSO: Processou %d msgs O2: %d%% (timestamp=%lu, válido=%d)", 
+                     messages_processed, o2_msg.o2_percent, o2_msg.timestamp, o2_msg.data_valid);
+            
+            if (o2_msg.data_valid) {
+                // ========== PROTEÇÃO MUTEX: Escrita em reg2000 ==========
+                if (modbus_lock_registers(100)) {
+                    // Atualiza registrador 2000 (dados principais) com valor da fila
+                    reg2000[dataValue] = o2_msg.o2_percent;
+                    modbus_unlock_registers();
+                } else {
+                    ESP_LOGW(TAG, "Timeout ao tentar lock para atualizar reg2000");
+                }
+                
+                // COMPATIBILIDADE: Também atualiza a variável global
+                extern volatile uint16_t sonda_o2Percent_sync;
+                sonda_o2Percent_sync = o2_msg.o2_percent;
+                
+                ESP_LOGD(TAG, "Registrador 2000 atualizado via fila: %d", o2_msg.o2_percent);
+            }
+            
+            // Log de estatísticas da fila a cada 10 iterações (mais frequente para debug)
+            static int total_processed = 0;
+            total_processed += messages_processed;
+            if (total_processed >= 10) {
+                uint32_t pending = queue_get_o2_pending_count();
+                ESP_LOGI(TAG, "Fila O2 Stats: %lu msgs pendentes, %d processadas nesta iteração", 
+                         (unsigned long)pending, messages_processed);
+                
+                // 🛠️ EMERGÊNCIA: Se fila está muito cheia (>40), limpa para evitar travamento
+                if (pending > 40) {
+                    ESP_LOGW(TAG, "EMERGÊNCIA: Fila muito cheia (%lu), limpando!", (unsigned long)pending);
+                    queue_clear_o2_data();
+                }
+                
+                total_processed = 0;
+            }
+        } else {
+            // ⏰ Nenhum dado novo na fila - continua com o método antigo (fallback)
+            ESP_LOGD(TAG, "📦 Fila O2 vazia, usando variáveis globais (fallback)");
+        }
+        
         // ========== SINCRONIZAÇÃO DOS DADOS DA SONDA COM REGISTRADORES MODBUS ==========
-        // Atualiza registradores com dados reais da MCT Task
+        // Atualiza registradores com dados reais da MCT Task (MÉTODO ANTIGO - mantido)
         extern volatile int16_t sonda_heatValue_sync;
         extern volatile int16_t sonda_lambdaValue_sync;
         extern volatile int16_t sonda_heatRef_sync;
@@ -274,15 +365,34 @@ void modbus_slave_task(void *pvParameters) {
         extern volatile uint16_t sonda_o2Percent_sync;
         extern volatile uint32_t sonda_output_sync;
         
-        // Sincroniza reg4000 com dados atuais da sonda
-        reg4000[lambdaValue] = sonda_lambdaValue_sync;
-        reg4000[lambdaRef] = sonda_lambdaRef_sync;
-        reg4000[heatValue] = sonda_heatValue_sync;
-        reg4000[heatRef] = sonda_heatRef_sync;
-        reg4000[output_mb] = (uint16_t)(sonda_output_sync & 0xFFFF); // Trunca para 16 bits
-        
-        // Adiciona O2% no registrador disponível (usando um dos campos de erro como exemplo)
-        reg4000[PROBE_DEMAGED] = sonda_o2Percent_sync; // O2% nos registradores de diagnóstico
+        // ========== PROTEÇÃO MUTEX: Atualização de reg2000 e reg4000 ==========
+        if (modbus_lock_registers(100)) {
+            // Sincroniza reg4000 com dados atuais da sonda
+            reg4000[lambdaValue] = sonda_lambdaValue_sync;
+            reg4000[lambdaRef] = sonda_lambdaRef_sync;
+            reg4000[heatValue] = sonda_heatValue_sync;
+            reg4000[heatRef] = sonda_heatRef_sync;
+            reg4000[output_mb] = (uint16_t)(sonda_output_sync & 0xFFFF); // Trunca para 16 bits
+            
+            // FALLBACK: Se não recebeu via fila, usa a variável global (compatibilidade)
+            if (messages_processed == 0) {
+                reg2000[dataValue] = sonda_o2Percent_sync; // Método antigo
+                reg4000[PROBE_DEMAGED] = sonda_o2Percent_sync; // O2% nos registradores de diagnóstico
+                ESP_LOGD(TAG, "📦 Usando fallback: O2=%d%% (variável global)", sonda_o2Percent_sync);
+            }
+            
+            modbus_unlock_registers();
+        } else {
+            ESP_LOGW(TAG, "Timeout ao tentar lock para sincronizar registradores");
+        }
+
+        // DEBUG: Log de processamento Modbus
+        static int modbus_cycle_count = 0;
+        modbus_cycle_count++;
+        if ((modbus_cycle_count % 1000) == 0) {
+            ESP_LOGI(TAG, "Modbus: %d ciclos processados, msgs fila: %d", 
+                     modbus_cycle_count, messages_processed);
+        }
 
         (void)mbc_slave_check_event(MB_READ_WRITE_MASK);
 
@@ -293,19 +403,25 @@ void modbus_slave_task(void *pvParameters) {
             ESP_LOGI(TAG, "HOLDING REG EVENT: ADDR=%u TYPE=%u", 
                      (unsigned)reg_info.mb_offset, (unsigned)reg_info.type);
             if (reg_info.type & MB_EVENT_HOLDING_REG_WR) {
+                // ========== PROTEÇÃO MUTEX: Escrita de registrador detectada ==========
+                // Nota: A escrita já foi feita pelo stack Modbus, mas precisamos
+                // proteger o acesso ao save_config() que pode ler os registradores
                 if (reg_info.mb_offset == 1000 + baudrate ||
                     reg_info.mb_offset == 1000 + endereco ||
-                    reg_info.mb_offset == 1000 + paridade) {
+                    reg_info.mb_offset == 1000 + paridade ||
+                    reg_info.mb_offset == 2000 + dataValue) {
+                    // Save config já lida internamente com acesso aos registradores
+                    // Não precisa de mutex aqui pois o stack Modbus já protege a escrita
                     save_config();
-    }
+                }
 }
 
                      
                      
         }
 
-        // Pequeno delay para não travar o scheduler
-        vTaskDelay(pdMS_TO_TICKS(10)); 
+        // DEBUG: Força processamento mais rápido para teste
+        vTaskDelay(pdMS_TO_TICKS(5));  // 5ms em vez de 10ms 
     }
 
     // Nunca deve chegar aqui

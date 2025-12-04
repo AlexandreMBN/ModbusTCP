@@ -1,0 +1,11 @@
+{
+    "rtu_enabled": true,
+    "tcp_enabled": false,
+    "AP_enabled": true,
+    "sta_enabled": true,
+    "web_enabled": true,
+    "log_main_flags": false,
+    "log_sonda_queue": false,
+    "log_sonda_values": false,
+    "log_modbus_tcp": false
+}

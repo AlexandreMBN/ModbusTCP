@@ -1,4 +1,4 @@
-#include "wifi_manager.h"
+﻿#include "wifi_manager.h"
 #include "webserver.h"
 #include "config_manager.h"
 #include <string.h>
@@ -13,6 +13,10 @@
 #include <stdio.h>
 #include <nvs_flash.h>
 #include <nvs.h>
+#include "main_config_flags.h"
+
+// Declaração explícita (garantia caso include path falhe)
+extern main_flags_t FLAGS;
 
 static const char *TAG = "WIFI_MANAGER";
 
@@ -35,6 +39,12 @@ static esp_netif_t *ap_netif = NULL;
 // handles para event handler instances (para poder desregistrar corretamente)
 static esp_event_handler_instance_t wifi_event_handle_inst = NULL;
 static esp_event_handler_instance_t ip_event_handle_inst = NULL;
+// Controle de retry de conexão STA
+static int sta_retry_count = 0;
+static const int STA_MAX_RETRY = 5;
+static bool sta_auto_reconnect_enabled = true;
+// Controle global para habilitar/desabilitar STA (configurado via main.c)
+static bool sta_enabled_flag = true;  // Por padrão, STA habilitado
 
 // Inicializa o mutex para sincronização WiFi
 static void init_wifi_mutex() {
@@ -438,7 +448,7 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
         // Cria uma task curta para iniciar o webserver após o AP estar ativo
         // Isso evita executar operações pesadas diretamente no handler de eventos
         static bool webserver_task_created = false;
-        if (!webserver_task_created) {
+                if (!webserver_task_created && FLAGS.web_enabled) {
             webserver_task_created = true;
             // cria task que chama start_web_server() e se encerra
             xTaskCreate(
@@ -449,6 +459,8 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                 5,
                 NULL
             );
+                } else if (!FLAGS.web_enabled) {
+                    ESP_LOGI(TAG, " WebServer não iniciado (web_enabled=false)");
         }
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STACONNECTED) {
         wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
@@ -461,9 +473,36 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
                  event->mac[0], event->mac[1], event->mac[2], 
                  event->mac[3], event->mac[4], event->mac[5]);
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
-        ESP_LOGI(TAG, "STA iniciado");
+        ESP_LOGI(TAG, "STA iniciado - verificando se deve conectar automaticamente");
+        
+        // Verifica se STA está habilitado via flag
+        if (!sta_enabled_flag) {
+            ESP_LOGI(TAG, " STA desabilitado via flag (sta_enabled=false) - não conectará automaticamente");
+            return;
+        }
+        
+        // Verifica se há configuração STA para conectar automaticamente
+        wifi_config_t sta_config;
+        if (esp_wifi_get_config(WIFI_IF_STA, &sta_config) == ESP_OK) {
+            // Se há SSID configurado, tenta conectar
+            if (strlen((char*)sta_config.sta.ssid) > 0) {
+                ESP_LOGI(TAG, "SSID configurado detectado: %s - Iniciando conexão automática", sta_config.sta.ssid);
+                esp_err_t conn_ret = esp_wifi_connect();
+                if (conn_ret != ESP_OK) {
+                    ESP_LOGW(TAG, "Falha ao iniciar conexão automática: %s", esp_err_to_name(conn_ret));
+                } else {
+                    ESP_LOGI(TAG, "Conexão STA iniciada automaticamente");
+                }
+            } else {
+                ESP_LOGI(TAG, "Nenhum SSID configurado, STA em standby");
+            }
+        }
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
-        ESP_LOGI(TAG, "STA conectado ao AP");
+        ESP_LOGI(TAG, "STA conectado ao AP - resetando contador de retry");
+        
+        // Reseta contador de retry quando conecta com sucesso
+        sta_retry_count = 0;
+        
         if (wifi_status_mutex == NULL) init_wifi_mutex();
         if (xSemaphoreTake(wifi_status_mutex, pdMS_TO_TICKS(1000)) == pdTRUE) {
             wifi_status.is_connected = true;
@@ -472,7 +511,12 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
         wifi_set_status_message("Conectando...");
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         wifi_event_sta_disconnected_t* event = (wifi_event_sta_disconnected_t*) event_data;
-        ESP_LOGI(TAG, "STA desconectado do AP, motivo: %d", event->reason);
+        ESP_LOGW(TAG, "STA desconectado do AP, motivo: %d (%s)", event->reason,
+                 event->reason == WIFI_REASON_AUTH_FAIL ? "Falha de autenticação" :
+                 event->reason == WIFI_REASON_NO_AP_FOUND ? "AP não encontrado" :
+                 event->reason == WIFI_REASON_ASSOC_LEAVE ? "Desconexão solicitada" :
+                 "Outro motivo");
+        
         if (wifi_status_mutex == NULL) init_wifi_mutex();
         if (xSemaphoreTake(wifi_status_mutex, pdMS_TO_TICKS(1000)) == pdTRUE) {
             wifi_status.is_connected = false;
@@ -480,27 +524,87 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
             wifi_status.ip_address[0] = '\0';
             xSemaphoreGive(wifi_status_mutex);
         }
-        wifi_set_status_message("Desconectado");
+        
+        // Retry automático se habilitado e não for desconexão intencional
+        if (sta_auto_reconnect_enabled && event->reason != WIFI_REASON_ASSOC_LEAVE) {
+            if (sta_retry_count < STA_MAX_RETRY) {
+                sta_retry_count++;
+                ESP_LOGI(TAG, "Tentando reconectar STA... (tentativa %d/%d)", sta_retry_count, STA_MAX_RETRY);
+                
+                // Aguarda um pouco antes de tentar novamente (backoff exponencial)
+                vTaskDelay(pdMS_TO_TICKS(1000 * sta_retry_count));
+                
+                esp_err_t ret = esp_wifi_connect();
+                if (ret != ESP_OK) {
+                    ESP_LOGE(TAG, "Falha ao tentar reconectar: %s", esp_err_to_name(ret));
+                }
+                wifi_set_status_message("Tentando reconectar...");
+            } else {
+                ESP_LOGW(TAG, "Máximo de tentativas de reconexão atingido (%d)", STA_MAX_RETRY);
+                wifi_set_status_message("Desconectado - máx. tentativas atingido");
+            }
+        } else {
+            wifi_set_status_message("Desconectado");
+        }
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         // Build human-readable ip/mask/gw strings
         char ipbuf[16] = {0}, maskbuf[16] = {0}, gwbuf[16] = {0};
         snprintf(ipbuf, sizeof(ipbuf), "%lu.%lu.%lu.%lu",
-                 (unsigned long)((event->ip_info.ip.addr >> 24) & 0xFF),
-                 (unsigned long)((event->ip_info.ip.addr >> 16) & 0xFF),
+                 (unsigned long)(event->ip_info.ip.addr & 0xFF),
                  (unsigned long)((event->ip_info.ip.addr >> 8) & 0xFF),
-                 (unsigned long)(event->ip_info.ip.addr & 0xFF));
+                 (unsigned long)((event->ip_info.ip.addr >> 16) & 0xFF),
+                 (unsigned long)((event->ip_info.ip.addr >> 24) & 0xFF));
         snprintf(maskbuf, sizeof(maskbuf), "%lu.%lu.%lu.%lu",
-                 (unsigned long)((event->ip_info.netmask.addr >> 24) & 0xFF),
-                 (unsigned long)((event->ip_info.netmask.addr >> 16) & 0xFF),
+                 (unsigned long)(event->ip_info.netmask.addr & 0xFF),
                  (unsigned long)((event->ip_info.netmask.addr >> 8) & 0xFF),
-                 (unsigned long)(event->ip_info.netmask.addr & 0xFF));
+                 (unsigned long)((event->ip_info.netmask.addr >> 16) & 0xFF),
+                 (unsigned long)((event->ip_info.netmask.addr >> 24) & 0xFF));
         snprintf(gwbuf, sizeof(gwbuf), "%lu.%lu.%lu.%lu",
-                 (unsigned long)((event->ip_info.gw.addr >> 24) & 0xFF),
-                 (unsigned long)((event->ip_info.gw.addr >> 16) & 0xFF),
+                 (unsigned long)(event->ip_info.gw.addr & 0xFF),
                  (unsigned long)((event->ip_info.gw.addr >> 8) & 0xFF),
-                 (unsigned long)(event->ip_info.gw.addr & 0xFF));
-
+                 (unsigned long)((event->ip_info.gw.addr >> 16) & 0xFF),
+                 (unsigned long)((event->ip_info.gw.addr >> 24) & 0xFF));
+        // ========================================
+        // DESTAQUE VISUAL PARA IP STA
+        // ========================================
+        printf("\n\n");
+        printf("\033[1;32m"); // Verde brilhante
+        printf("████████████████████████████████████████████████████████████████\n");
+        printf("█                                                              █\n");
+        printf("█          *** STA CONECTADO COM SUCESSO ***                  █\n");
+        printf("█                                                              █\n");
+        printf("████████████████████████████████████████████████████████████████\n");
+        printf("\033[0m"); // Reset cor
+        
+        printf("\n");
+        printf("\033[1;33m"); // Amarelo brilhante
+        printf("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n");
+        printf("┃                    INFORMAÇÕES DE REDE                     ┃\n");
+        printf("┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n");
+        printf("┃ \033[1;36mIP:      %-40s\033[1;33m ┃\n", ipbuf);
+        printf("┃ \033[1;36mMÁSCARA: %-40s\033[1;33m ┃\n", maskbuf);
+        printf("┃ \033[1;36mGATEWAY: %-40s\033[1;33m ┃\n", gwbuf);
+        printf("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n");
+        printf("\033[0m"); // Reset cor
+        
+        // REPETIÇÃO DO IP EM DESTAQUE ESPECIAL
+        printf("\n");
+        printf("\033[1;41m\033[1;37m"); // Fundo vermelho, texto branco brilhante
+        printf("  >>> IP STA: %s <<<  ", ipbuf);
+        printf("\033[0m");
+        printf("  \033[1;32m(COPIE ESTE IP!)\033[0m\n");
+        
+        printf("\n");
+        printf("\033[1;35m"); // Magenta brilhante
+        printf("▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n");
+        printf("▓                                                              ▓\n");
+        printf("▓  ACESSE O WEBSERVER EM: http://%-23s       ▓\n", ipbuf);
+        printf("▓                                                              ▓\n");
+        printf("▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n");
+        printf("\033[0m"); // Reset cor
+        printf("\n\n");
+        
         ESP_LOGI(TAG, "*** STA CONECTADO COM SUCESSO ***");
         ESP_LOGI(TAG, "  IP: %s  MASK: %s  GW: %s", ipbuf, maskbuf, gwbuf);
 
@@ -511,6 +615,13 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
             strncpy(ssid_log, (char*)ap_info.ssid, sizeof(ssid_log)-1);
             ESP_LOGI(TAG, "  SSID: '%s'  RSSI: %d dBm", ssid_log, ap_info.rssi);
             ESP_LOGI(TAG, "*** MODO DUAL ATIVO: AP + STA FUNCIONANDO ***");
+            
+            // DESTAQUE ADICIONAL PARA O SSID CONECTADO
+            printf("\n");
+            printf("\033[1;44m\033[1;37m"); // Fundo azul, texto branco
+            printf("  >>> CONECTADO À REDE: %s <<<  ", ssid_log);
+            printf("\033[0m");
+            printf("  \033[1;33m(RSSI: %d dBm)\033[0m\n", ap_info.rssi);
             if (wifi_status_mutex == NULL) init_wifi_mutex();
             if (xSemaphoreTake(wifi_status_mutex, pdMS_TO_TICKS(1000)) == pdTRUE) {
                 strncpy(wifi_status.current_ssid, ssid_log, sizeof(wifi_status.current_ssid)-1);
@@ -540,6 +651,26 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
         char status_msg[WIFI_STATUS_MSG_MAX_LEN];
         snprintf(status_msg, sizeof(status_msg), "Conectado com sucesso! IP: %s", ipbuf);
         wifi_set_status_message(status_msg);
+        
+        // REPETIÇÃO FINAL DO IP PARA GARANTIR VISIBILIDADE (5 VEZES)
+        printf("\n");
+        for(int i = 0; i < 5; i++) {
+            printf("\033[1;43m\033[1;30m"); // Fundo amarelo brilhante, texto preto
+            printf("════════════════════════════════════════");
+            printf("\033[0m\n");
+            printf("\033[1;43m\033[1;30m"); // Fundo amarelo brilhante, texto preto  
+            printf("   IP FINAL: %-23s   ", ipbuf);
+            printf("\033[0m\n");
+            printf("\033[1;43m\033[1;30m"); // Fundo amarelo brilhante, texto preto
+            printf("════════════════════════════════════════");
+            printf("\033[0m\n");
+            
+            if(i < 4) { // Não adicionar linha extra na última repetição
+                printf("\n");
+            }
+        }
+        printf("\n");
+        
         // Schedule AP disable now that STA has IP
         wifi_disable_ap_now();
     }
@@ -591,35 +722,49 @@ void start_wifi_ap() {
     }
     
     // Carregar configurações do AP do NVS
-    char ap_ssid[32] = "ESP32_CONFIG";  // Valor padrão
+    char ap_ssid[32] = "ESP32-MCT-01";  // Valor padrão
     char ap_password[64] = "12345678";  // Valor padrão
     char ap_ip[16] = "192.168.4.1";    // Valor padrão
     
-    // Tentar carregar do NVS
-    nvs_handle_t nvs_handle;
-    esp_err_t nvs_err = nvs_open("ap_config", NVS_READONLY, &nvs_handle);
-    if (nvs_err == ESP_OK) {
-        size_t required_size = sizeof(ap_ssid);
-        esp_err_t ssid_err = nvs_get_str(nvs_handle, "ssid", ap_ssid, &required_size);
-        
-        required_size = sizeof(ap_password);
-        esp_err_t pwd_err = nvs_get_str(nvs_handle, "password", ap_password, &required_size);
-        
-        required_size = sizeof(ap_ip);
-        esp_err_t ip_err = nvs_get_str(nvs_handle, "ip", ap_ip, &required_size);
-        
-        nvs_close(nvs_handle);
-        
-        if (ssid_err == ESP_OK && pwd_err == ESP_OK && ip_err == ESP_OK) {
-            ESP_LOGI(TAG, "Configurações do AP carregadas do NVS:");
-            ESP_LOGI(TAG, "  SSID: %s", ap_ssid);
-            ESP_LOGI(TAG, "  Password: %s", ap_password);
-            ESP_LOGI(TAG, "  IP: %s", ap_ip);
-        } else {
-            ESP_LOGW(TAG, "Algumas configurações do AP não encontradas no NVS, usando padrões");
-        }
+    // 🆕 PRIORIDADE 1: Tentar carregar do arquivo JSON primeiro
+    ap_config_t ap_config_json;
+    if (load_ap_config(&ap_config_json) == ESP_OK) {
+        ESP_LOGI(TAG, "Configurações AP carregadas do arquivo JSON:");
+        strncpy(ap_ssid, ap_config_json.ssid, sizeof(ap_ssid)-1);
+        strncpy(ap_password, ap_config_json.password, sizeof(ap_password)-1);
+        strncpy(ap_ip, ap_config_json.ip, sizeof(ap_ip)-1);
+        ESP_LOGI(TAG, "  SSID: %s", ap_ssid);
+        ESP_LOGI(TAG, "  Password: %s", ap_password);
+        ESP_LOGI(TAG, "  IP: %s", ap_ip);
     } else {
-        ESP_LOGW(TAG, "Não foi possível abrir NVS para configurações do AP, usando padrões");
+        ESP_LOGI(TAG, "Arquivo JSON não encontrado, tentando NVS...");
+        
+        // FALLBACK: Tentar carregar do NVS
+        nvs_handle_t nvs_handle;
+        esp_err_t nvs_err = nvs_open("ap_config", NVS_READONLY, &nvs_handle);
+        if (nvs_err == ESP_OK) {
+            size_t required_size = sizeof(ap_ssid);
+            esp_err_t ssid_err = nvs_get_str(nvs_handle, "ssid", ap_ssid, &required_size);
+            
+            required_size = sizeof(ap_password);
+            esp_err_t pwd_err = nvs_get_str(nvs_handle, "password", ap_password, &required_size);
+            
+            required_size = sizeof(ap_ip);
+            esp_err_t ip_err = nvs_get_str(nvs_handle, "ip", ap_ip, &required_size);
+            
+            nvs_close(nvs_handle);
+            
+            if (ssid_err == ESP_OK && pwd_err == ESP_OK && ip_err == ESP_OK) {
+                ESP_LOGI(TAG, "Configurações do AP carregadas do NVS:");
+                ESP_LOGI(TAG, "  SSID: %s", ap_ssid);
+                ESP_LOGI(TAG, "  Password: %s", ap_password);
+                ESP_LOGI(TAG, "  IP: %s", ap_ip);
+            } else {
+                ESP_LOGW(TAG, "Algumas configurações do AP não encontradas no NVS, usando padrões");
+            }
+        } else {
+            ESP_LOGW(TAG, "Não foi possível abrir NVS para configurações do AP, usando padrões");
+        }
     }
     
     wifi_config_t ap_config = {
@@ -684,7 +829,16 @@ void start_wifi_ap() {
         return;
     }
     
+    ESP_LOGI(TAG, "WiFi iniciado, aguardando estabilização...");
     vTaskDelay(pdMS_TO_TICKS(1000));
+    
+    // Verifica modo atual
+    wifi_mode_t actual_mode;
+    esp_wifi_get_mode(&actual_mode);
+    ESP_LOGI(TAG, "Modo WiFi atual: %s", 
+             actual_mode == WIFI_MODE_STA ? "STA" :
+             actual_mode == WIFI_MODE_AP ? "AP" :
+             actual_mode == WIFI_MODE_APSTA ? "APSTA" : "UNKNOWN");
     
     wifi_initialized = true;
     if (wifi_status_mutex == NULL) init_wifi_mutex();
@@ -699,42 +853,78 @@ void start_wifi_ap() {
     ESP_LOGI(TAG, "  Servidor web deve estar acessível em: http://%s", ap_ip);
     
     // AP iniciado; o webserver será iniciado pelo app_main()
-    ESP_LOGI(TAG, "AP ativo; start_web_server() será chamado externamente.");
+    ESP_LOGI(TAG, "AP ativo; aguardando eventos de conexão STA...");
 
     // Verificar se há configurações WiFi salvas e tentar conectar automaticamente
     ESP_LOGI(TAG, "=== VERIFICANDO CONFIGURAÇÕES WIFI SALVAS ===");
-    nvs_handle_t wifi_nvs_handle;
-    esp_err_t wifi_nvs_err = nvs_open("wifi_config", NVS_READONLY, &wifi_nvs_handle);
-    if (wifi_nvs_err == ESP_OK) {
-        char saved_ssid[64] = "";
-        char saved_password[64] = "";
-        size_t required_size = sizeof(saved_ssid);
-        
-        esp_err_t ssid_err = nvs_get_str(wifi_nvs_handle, "wifi_ssid", saved_ssid, &required_size);
-        required_size = sizeof(saved_password);
-        esp_err_t pwd_err = nvs_get_str(wifi_nvs_handle, "wifi_password", saved_password, &required_size);
-        
-        nvs_close(wifi_nvs_handle);
-        
-        if (ssid_err == ESP_OK && strlen(saved_ssid) > 0) {
-            ESP_LOGI(TAG, "*** CONFIGURAÇÃO WIFI ENCONTRADA ***");
-            ESP_LOGI(TAG, "  SSID salvo: %s", saved_ssid);
-            ESP_LOGI(TAG, "  Password length: %d", strlen(saved_password));
-            ESP_LOGI(TAG, "*** MODO DUAL ATIVO: AP + STA ***");
-            ESP_LOGI(TAG, "  AP ativo em: %s (SSID: %s)", ap_ip, ap_ssid);
-            ESP_LOGI(TAG, "  Tentando conectar STA à: %s", saved_ssid);
-            
-            // Conectar automaticamente à rede salva
-            wifi_connect(saved_ssid, saved_password);
-        } else {
-            ESP_LOGI(TAG, "*** NENHUMA CONFIGURAÇÃO WIFI SALVA ***");
-            ESP_LOGI(TAG, "*** MODO AP APENAS ***");
-            ESP_LOGI(TAG, "  AP ativo em: %s (SSID: %s)", ap_ip, ap_ssid);
-        }
+    
+    char saved_ssid[64] = "";
+    char saved_password[64] = "";
+    bool config_found = false;
+    
+    // 🆕 PRIORIDADE 1: Tentar carregar do arquivo JSON primeiro
+    sta_config_t sta_config_json;
+    if (load_sta_config(&sta_config_json) == ESP_OK) {
+        ESP_LOGI(TAG, "Configurações STA carregadas do arquivo JSON:");
+        strncpy(saved_ssid, sta_config_json.ssid, sizeof(saved_ssid)-1);
+        strncpy(saved_password, sta_config_json.password, sizeof(saved_password)-1);
+        ESP_LOGI(TAG, "  SSID: %s", saved_ssid);
+        ESP_LOGI(TAG, "  Password length: %d", strlen(saved_password));
+        config_found = true;
     } else {
-        ESP_LOGI(TAG, "*** NVS WIFI NÃO ACESSÍVEL ***");
-        ESP_LOGI(TAG, "*** MODO AP APENAS ***");
-        ESP_LOGI(TAG, "  AP ativo em: %s (SSID: %s)", ap_ip, ap_ssid);
+        ESP_LOGI(TAG, "Arquivo STA JSON não encontrado, tentando NVS...");
+        
+        // FALLBACK: Tentar carregar do NVS
+        nvs_handle_t wifi_nvs_handle;
+        esp_err_t wifi_nvs_err = nvs_open("wifi_config", NVS_READONLY, &wifi_nvs_handle);
+        if (wifi_nvs_err == ESP_OK) {
+            size_t required_size = sizeof(saved_ssid);
+            
+            esp_err_t ssid_err = nvs_get_str(wifi_nvs_handle, "wifi_ssid", saved_ssid, &required_size);
+            required_size = sizeof(saved_password);
+            esp_err_t pwd_err = nvs_get_str(wifi_nvs_handle, "wifi_password", saved_password, &required_size);
+            
+            nvs_close(wifi_nvs_handle);
+            
+            if (ssid_err == ESP_OK && strlen(saved_ssid) > 0) {
+                ESP_LOGI(TAG, "Configurações STA carregadas do NVS:");
+                ESP_LOGI(TAG, "  SSID: %s", saved_ssid);
+                ESP_LOGI(TAG, "  Password length: %d", strlen(saved_password));
+                config_found = true;
+            }
+        }
+    }
+    
+    // Verifica se STA está habilitado via flag externa
+    if (!sta_enabled_flag) {
+        ESP_LOGI(TAG, "╔═══════════════════════════════════════════════════════════════╗");
+        ESP_LOGI(TAG, "║      *** STA DESABILITADO VIA CONFIGURAÇÃO (FLAG) ***        ║");
+        ESP_LOGI(TAG, "╠═══════════════════════════════════════════════════════════════╣");
+        ESP_LOGI(TAG, "║  AP ativo em: %-44s║", ap_ip);
+        ESP_LOGI(TAG, "║  AP SSID: %-48s║", ap_ssid);
+        ESP_LOGI(TAG, "║  STA: DESABILITADO (sta_enabled=false no main_config.json)  ║");
+        ESP_LOGI(TAG, "║  Para habilitar: mude sta_enabled=true e reinicie            ║");
+        ESP_LOGI(TAG, "╚═══════════════════════════════════════════════════════════════╝");
+    } else if (config_found && strlen(saved_ssid) > 0) {
+        
+        ESP_LOGI(TAG, "╔═══════════════════════════════════════════════════════════════╗");
+        ESP_LOGI(TAG, "║   *** CONFIGURAÇÃO WIFI ENCONTRADA - ATIVANDO MODO DUAL ***  ║");
+        ESP_LOGI(TAG, "╠═══════════════════════════════════════════════════════════════╣");
+        ESP_LOGI(TAG, "║  AP ativo em: %-44s║", ap_ip);
+        ESP_LOGI(TAG, "║  AP SSID: %-48s║", ap_ssid);
+        ESP_LOGI(TAG, "║  STA conectando à: %-39s║", saved_ssid);
+        ESP_LOGI(TAG, "╚═══════════════════════════════════════════════════════════════╝");
+        
+        // Conectar automaticamente à rede salva
+        wifi_connect(saved_ssid, saved_password);
+    } else {
+        ESP_LOGI(TAG, "╔═══════════════════════════════════════════════════════════════╗");
+        ESP_LOGI(TAG, "║    *** NENHUMA CONFIGURAÇÃO WIFI SALVA - MODO AP APENAS ***  ║");
+        ESP_LOGI(TAG, "╠═══════════════════════════════════════════════════════════════╣");
+        ESP_LOGI(TAG, "║  AP ativo em: %-44s║", ap_ip);
+        ESP_LOGI(TAG, "║  AP SSID: %-48s║", ap_ssid);
+        ESP_LOGI(TAG, "║  Configure o STA via interface web em http://%-16s║", ap_ip);
+        ESP_LOGI(TAG, "╚═══════════════════════════════════════════════════════════════╝");
     }
 
     // Dispara um scan inicial em background para popular a lista de redes
@@ -767,6 +957,10 @@ void wifi_connect(const char* ssid, const char* password) {
         return;
     }
     
+    // Reseta contador de retry para nova tentativa de conexão
+    sta_retry_count = 0;
+    sta_auto_reconnect_enabled = true;
+    
     // Cancela task de fallback anterior se existir
     if (fallback_task_handle != NULL) {
         vTaskDelete(fallback_task_handle);
@@ -783,7 +977,7 @@ void wifi_connect(const char* ssid, const char* password) {
     wifi_config.sta.threshold.rssi = -127;
     
     // Configura AP também para manter o webserver ativo - usar configurações salvas
-    char ap_ssid[32] = "ESP32_CONFIG";  // Valor padrão
+    char ap_ssid[32] = "ESP32-MCT-01";  // Valor padrão
     char ap_password[64] = "12345678";  // Valor padrão
     
     // Carregar configurações do AP do NVS
@@ -815,37 +1009,63 @@ void wifi_connect(const char* ssid, const char* password) {
     wifi_mode_t current_mode;
     esp_wifi_get_mode(&current_mode);
     if (current_mode != WIFI_MODE_APSTA) {
+        ESP_LOGI(TAG, "Mudando de modo %d para APSTA", current_mode);
         safe_wifi_stop();
         vTaskDelay(pdMS_TO_TICKS(500));
-        safe_wifi_mode_change(WIFI_MODE_APSTA);
+        
+        esp_err_t mode_ret = safe_wifi_mode_change(WIFI_MODE_APSTA);
+        if (mode_ret != ESP_OK) {
+            ESP_LOGE(TAG, "Falha ao mudar para modo APSTA: %s", esp_err_to_name(mode_ret));
+            return;
+        }
         vTaskDelay(pdMS_TO_TICKS(500));
-        safe_wifi_start();
+        
+        esp_err_t start_ret = safe_wifi_start();
+        if (start_ret != ESP_OK) {
+            ESP_LOGE(TAG, "Falha ao iniciar WiFi após mudança de modo: %s", esp_err_to_name(start_ret));
+            return;
+        }
         vTaskDelay(pdMS_TO_TICKS(1000));
+        ESP_LOGI(TAG, "Modo APSTA ativado com sucesso");
+    } else {
+        ESP_LOGI(TAG, "WiFi já está em modo APSTA");
     }
     
-    // Configura ambas as interfaces
-    esp_err_t ret = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Falha ao configurar STA: %s", esp_err_to_name(ret));
-        return;
-    }
-    
-    ret = esp_wifi_set_config(WIFI_IF_AP, &ap_config);
+    // Configura interface AP primeiro para manter estabilidade
+    esp_err_t ret = esp_wifi_set_config(WIFI_IF_AP, &ap_config);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Falha ao configurar AP: %s", esp_err_to_name(ret));
         return;
     }
+    ESP_LOGI(TAG, "Configuração AP aplicada");
     
-    // Conecta
-    ret = esp_wifi_connect();
+    // Configura interface STA
+    ret = esp_wifi_set_config(WIFI_IF_STA, &wifi_config);
     if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Falha ao iniciar conexão: %s", esp_err_to_name(ret));
+        ESP_LOGE(TAG, "Falha ao configurar STA: %s", esp_err_to_name(ret));
         return;
     }
+    ESP_LOGI(TAG, "Configuração STA aplicada para SSID: %s", ssid);
+    
+    // IMPORTANTE: Não chama esp_wifi_connect() aqui!
+    // O evento WIFI_EVENT_STA_START fará isso automaticamente
+    ESP_LOGI(TAG, "Aguardando evento WIFI_EVENT_STA_START para iniciar conexão...");
 
     // Aplica IP estático automaticamente, se existir configuração
     char ip[16] = "", mask[16] = "", gw[16] = "", dns[16] = "";
-    read_network_config(ip, sizeof(ip), mask, sizeof(mask), gw, sizeof(gw), dns, sizeof(dns));
+    network_config_t net_config;
+    if (load_network_config(&net_config) == ESP_OK) {
+        strncpy(ip, net_config.ip, sizeof(ip)-1);
+        strncpy(mask, net_config.mask, sizeof(mask)-1);
+        strncpy(gw, net_config.gateway, sizeof(gw)-1);
+        strncpy(dns, net_config.dns, sizeof(dns)-1);
+        ip[sizeof(ip)-1] = '\0';
+        mask[sizeof(mask)-1] = '\0';
+        gw[sizeof(gw)-1] = '\0';
+        dns[sizeof(dns)-1] = '\0';
+    } else {
+        ip[0] = mask[0] = gw[0] = dns[0] = '\0';
+    }
     if (strlen(ip) > 0 && strlen(mask) > 0 && strlen(gw) > 0) {
         ESP_LOGI(TAG, "Aplicando IP estático salvo em network_config.json");
         wifi_apply_static_ip(ip, mask, gw, dns);
@@ -872,7 +1092,12 @@ void wifi_disconnect() {
         return;
     }
     
-    ESP_LOGI(TAG, "Desconectando WiFi STA");
+    ESP_LOGI(TAG, "Desconectando WiFi STA (desconexão intencional)");
+    
+    // Desabilita auto-reconnect para desconexão intencional
+    sta_auto_reconnect_enabled = false;
+    sta_retry_count = 0;
+    
     esp_wifi_disconnect();
     
     // Cancela task de fallback se existir
@@ -1104,4 +1329,29 @@ esp_err_t wifi_apply_dhcp() {
     wifi_set_status_message("DHCP ativado com sucesso");
     
     return ESP_OK;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// FUNÇÕES DE CONTROLE DE STA (habilitado/desabilitado via flag)
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * @brief Define se o STA deve ser habilitado
+ * 
+ * IMPORTANTE: Deve ser chamado ANTES de start_wifi_ap()
+ * 
+ * @param enabled true para habilitar STA, false para desabilitar
+ */
+void wifi_set_sta_enabled(bool enabled) {
+    sta_enabled_flag = enabled;
+    ESP_LOGI(TAG, "STA %s via flag de configuração", enabled ? "HABILITADO" : "DESABILITADO");
+}
+
+/**
+ * @brief Retorna se o STA está habilitado
+ * 
+ * @return true se STA está habilitado, false caso contrário
+ */
+bool wifi_get_sta_enabled(void) {
+    return sta_enabled_flag;
 } 

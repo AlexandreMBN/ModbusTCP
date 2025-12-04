@@ -1,4 +1,4 @@
-/*
+﻿/*
  * ========================================================================
  * MQTT CLIENT TASK - PUBLICAÇÃO DOS DADOS DA SONDA LAMBDA
  * ========================================================================
@@ -25,6 +25,7 @@
  */
 
 #include "mqtt_client_task.h"
+#include "config_manager.h"
 #include "mqtt_client.h"
 #include "esp_vfs.h"
 #include "esp_spiffs.h"
@@ -241,8 +242,21 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 esp_err_t mqtt_init(void) {
     ESP_LOGI(TAG, "Inicializando cliente MQTT");
     
-    // Configura valores padrão
+    // Configura valores padrão primeiro
     mqtt_set_default_config();
+    
+    // 🆕 Tentar carregar configurações do arquivo JSON
+    mqtt_config_t mqtt_config_from_file;
+    if (load_mqtt_config(&mqtt_config_from_file) == ESP_OK) {
+        ESP_LOGI(TAG, "Configurações MQTT carregadas do arquivo JSON");
+        // Sobrescreve a configuração padrão com dados do arquivo
+        mqtt_config = mqtt_config_from_file;
+        ESP_LOGI(TAG, "  Broker: %s", mqtt_config.broker_url);
+        ESP_LOGI(TAG, "  Client ID: %s", mqtt_config.client_id);
+        ESP_LOGI(TAG, "  Enabled: %s", mqtt_config.enabled ? "true" : "false");
+    } else {
+        ESP_LOGI(TAG, "Arquivo MQTT JSON não encontrado, usando valores padrão");
+    }
     
     // Cria mutex e fila
     mqtt_mutex = xSemaphoreCreateMutex();

@@ -7,22 +7,48 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <div class="config-device-container">
-        <div class="header">
-            <h1 class="config-device-title">ℹ️ Informações do Sistema</h1>
-            <a class="btn btn-voltar" href="/admin">⬅️ Voltar</a>
-        <div>
-            <div class="brand">
-                <div class="brand-main">
-                    <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
-                    <h2 class="brand-company">Infitech - Automação</h2>
-                </div>
-                <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+    <!-- Cabeçalho Turquesa -->
+    <div class="header-bar">
+        <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech" class="header-logo">
+        <div class="header-title">
+            <h1>Medidor de Combustão</h1>
+            <p>Modelo MCT-1</p>
+        </div>
+    </div>
+
+    <!-- Container Principal: Sidebar + Conteúdo -->
+    <div class="main-container">
+        <!-- Menu Lateral Amarelo -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Status</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="/info" class="active">Informações do Dispositivo</a></li>
+                    <li><a href="/admin">Gerenciamento de Configurações</a></li>
+                </ul>
             </div>
-            <h1>ℹ️ Informações do Sistema</h1>
-        
-            <div>
-            <h2>🖥️ Informações do ESP32</h2>
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Configurações</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="/config_unidade">Configuração de Dispositivo</a></li>
+                    <li><a href="/mqtt_config">Configuração MQTT/TLS</a></li>
+                    <li><a href="/modbus">Registradores Modbus</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <ul class="sidebar-menu">
+                    <li><a href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Área de Conteúdo -->
+        <div class="content-area">
+            <h2 class="page-title">Basic Status</h2>
+
+            <!-- Card: Informações do ESP32 -->
+            <div class="info-card">
+                <h2>Informações do ESP32</h2>
             <div class="info-grid">
                 <div class="info-item">
                     <span class="info-label">Modelo do Chip:</span>
@@ -57,11 +83,11 @@
                     <span class="info-value">{{MAC_ADDRESS}}</span>
                 </div>
             </div>
-        </div>
+            </div>
 
-        <!-- Card: Informações do Programa -->
-        <div class="config-card">
-            <h2>📦 Informações do Programa</h2>
+            <!-- Card: Informações do Programa -->
+            <div class="info-card">
+                <h2>Informações do Programa</h2>
             <div class="info-grid">
                 <div class="info-item">
                     <span class="info-label">Nome do Projeto:</span>
@@ -92,7 +118,7 @@
 
         <!-- Card: Configurações de Rede AP -->
         <div class="config-card">
-            <h2>📶 Configurações do Access Point</h2>
+            <h2>Configurações do Access Point</h2>
             <div class="info-grid">
                 <div class="info-item">
                     <span class="info-label">Nome da Rede (SSID):</span>
@@ -123,7 +149,7 @@
 
         <!-- Card: Configurações de Rede WiFi -->
         <div class="config-card">
-            <h2>🌐 Configurações do WiFi Cliente</h2>
+            <h2>Configurações do WiFi Cliente</h2>
             <div class="info-grid">
                 <div class="info-item">
                     <span class="info-label">Rede Conectada (SSID):</span>
@@ -133,7 +159,7 @@
                     <span class="info-label">Senha Configurada:</span>
                     <span class="info-value">
                         <span id="wifi_password_display">{{WIFI_PASSWORD_DISPLAY}}</span>
-                        <button type="button" id="wifi_password_toggle" class="password-toggle-btn" aria-label="Mostrar/ocultar senha">👁️</button>
+                        <button type="button" id="wifi_password_toggle" class="password-toggle-btn" aria-label="Mostrar/ocultar senha"></button>
                         <span id="wifi_password_plain" style="display:none">{{WIFI_PASSWORD_PLAIN}}</span>
                     </span>
                 </div>
@@ -160,12 +186,15 @@
             </div>
         </div>
 
-        <!-- Botões de Ação -->
-        <div class="form-actions" style="text-align: center; margin-top: 30px;">
-            <button class="btn-config btn-secondary" type="button" onclick="location.reload()">🔄 Atualizar Informações</button>
-            <a class="btn-config btn-primary" href="/admin">↩️ Voltar para Admin</a>
+            <!-- Botões de Ação -->
+            <div style="text-align: center; margin-top: 30px;">
+                <button type="button" onclick="location.reload()">Atualizar Informações</button>
+                <button type="button" onclick="location.href='/admin'" style="background: #999;">Voltar para Admin</button>
+            </div>
         </div>
+        <!-- Fim content-area -->
     </div>
+    <!-- Fim main-container -->
 </body>
 <script>
     (function() {
@@ -186,12 +215,12 @@
                 } else {
                     display.textContent = '(sem senha)';
                 }
-                toggleBtn.textContent = '🙈';
+                toggleBtn.textContent = '';
                 showing = true;
             } else {
                 // voltar a máscara
                 display.textContent = '{{WIFI_PASSWORD_DISPLAY}}';
-                toggleBtn.textContent = '👁️';
+                toggleBtn.textContent = '';
                 showing = false;
             }
         });

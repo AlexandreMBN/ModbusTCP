@@ -1,0 +1,159 @@
+{
+  "name": "Config Manager",
+  "version": "1.0.0",
+  "description": "Biblioteca completa e robusta para gerenciamento de configurações JSON no ESP32. Oferece validação automática, backup em NVS, sistema de usuários, callbacks e API unificada para todas as configurações do seu projeto IoT.",
+  "keywords": [
+    "esp32",
+    "configuration",
+    "json",
+    "spiffs",
+    "nvs",
+    "validation",
+    "backup",
+    "iot",
+    "settings",
+    "config-manager",
+    "esp-idf",
+    "platformio"
+  ],
+  "authors": [
+    {
+      "name": "ESP32 Development Team",
+      "email": "dev@esp32.com"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/esp32/config-manager",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esp32/config-manager.git"
+  },
+  "frameworks": ["espidf"],
+  "platforms": ["espressif32"],
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src",
+    "srcFilter": [
+      "+<*>",
+      "-<examples/>",
+      "-<test/>"
+    ]
+  },
+  "dependencies": {
+    "esp_spiffs": "*",
+    "nvs_flash": "*",
+    "json": "*",
+    "esp_common": "*"
+  },
+  "export": {
+    "include": [
+      "include/config_manager.h"
+    ]
+  },
+  "examples": [
+    {
+      "name": "Basic Usage",
+      "base": "examples",
+      "files": [
+        "config_manager_example.c"
+      ]
+    },
+    {
+      "name": "Config Templates",
+      "base": "examples",
+      "files": [
+        "ap_config_template.json",
+        "sta_config_template.json",
+        "mqtt_config_template.json",
+        "network_config_template.json"
+      ]
+    }
+  ],
+  "headers": "config_manager.h",
+  "config": {
+    "enable_validation": {
+      "type": "bool",
+      "default": true,
+      "description": "Habilitar sistema de validação de configurações"
+    },
+    "enable_nvs_backup": {
+      "type": "bool",
+      "default": true,
+      "description": "Habilitar backup automático em NVS"
+    },
+    "max_json_size": {
+      "type": "integer",
+      "default": 8192,
+      "description": "Tamanho máximo dos arquivos JSON em bytes"
+    },
+    "auto_create_dirs": {
+      "type": "bool",
+      "default": true,
+      "description": "Criar diretórios automaticamente se não existirem"
+    },
+    "enable_legacy_paths": {
+      "type": "bool",
+      "default": true,
+      "description": "Suporte a caminhos de configuração antigos"
+    },
+    "min_level_write": {
+      "type": "string",
+      "default": "BASIC",
+      "description": "Nível mínimo de usuário para escrita"
+    },
+    "debug_logs": {
+      "type": "bool",
+      "default": false,
+      "description": "Habilitar logs detalhados de debug"
+    }
+  },
+  "features": [
+    "Gerenciamento unificado de configurações JSON",
+    "Sistema de validação com schemas customizáveis",
+    "Backup automático em NVS (memória não volátil)",
+    "Recuperação automática em caso de falha",
+    "Sistema de usuários com níveis de acesso",
+    "Callbacks para mudanças de configuração",
+    "Processadores customizados para configs",
+    "API de alto nível para configs pré-definidas",
+    "Compatibilidade com SPIFFS",
+    "Migração automática de formatos antigos",
+    "Validação de tipos e valores",
+    "Controle de acesso granular",
+    "Cache inteligente",
+    "Diagnósticos do sistema"
+  ],
+  "usage": {
+    "initialization": {
+      "description": "Inicializar a biblioteca",
+      "code": "config_manager_config_t config;\nconfig_manager_get_default_config(&config);\nconfig_manager_init(&config);"
+    },
+    "save_config": {
+      "description": "Salvar configuração JSON",
+      "code": "cJSON *config = cJSON_CreateObject();\ncJSON_AddStringToObject(config, \"ssid\", \"MyWiFi\");\nconfig_manager_save_json(\"wifi_config\", config);\ncJSON_Delete(config);"
+    },
+    "load_config": {
+      "description": "Carregar configuração JSON",
+      "code": "cJSON *config = NULL;\nif (config_manager_load_json(\"wifi_config\", &config) == CONFIG_MANAGER_OK) {\n    // Use config\n    cJSON_Delete(config);\n}"
+    },
+    "validation": {
+      "description": "Registrar schema de validação",
+      "code": "config_field_validator_t fields[] = {{\"ssid\", CONFIG_TYPE_STRING, true, ...}};\nconfig_schema_t schema = {\"wifi_config\", fields, 1, CONFIG_USER_LEVEL_ADMIN};\nconfig_manager_register_schema(&schema);"
+    }
+  },
+  "performance": {
+    "memory_usage": "~12KB RAM base + configurações em memória",
+    "file_system": "SPIFFS com backup NVS",
+    "max_configs": "32 configurações simultâneas",
+    "max_file_size": "8KB por arquivo (configurável)",
+    "validation_schemas": "Até 32 schemas personalizados",
+    "callbacks": "Até 8 callbacks por configuração"
+  },
+  "compatibility": {
+    "esp_idf": ">=4.4",
+    "platforms": ["ESP32", "ESP32-S2", "ESP32-S3", "ESP32-C3"],
+    "memory": "Minimum 512KB Flash, 256KB RAM",
+    "file_systems": ["SPIFFS", "LittleFS (futuro)"],
+    "formats": ["JSON", "Legacy format migration"]
+  }
+}

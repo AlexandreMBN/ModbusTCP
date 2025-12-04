@@ -9,8 +9,8 @@
 <body>
     <div class="config-device-container">
         <div class="header">
-            <h1 class="config-device-title">📶 Configuração Wi-Fi</h1>
-            <a class="btn btn-voltar" href="/config_unidade">⬅️ Voltar</a>
+            <h1 class="config-device-title">Configuração Wi-Fi</h1>
+            <a class="btn btn-voltar" href="/config_unidade">Voltar</a>
         <div>
             <div class="brand">
                 <div class="brand-main">
@@ -19,11 +19,11 @@
                 </div>
                 <div class="brand-program">Programa: <strong>MCT-01</strong></div>
             </div>
-            <h1>📶 WiFi</h1>
+            <h1>WiFi</h1>
         
             <div>
             <div class="config-card">
-                <h2>📊 Status da Conexão</h2>
+                <h2>Status da Conexão</h2>
                 
                 <div id="wifi-status" class="config-readonly-item">
                     <span class="config-readonly-label">Status:</span>
@@ -46,13 +46,13 @@
                 </div>
                 
                 <div class="form-actions">
-                    <button class="btn-config btn-primary" onclick="location.reload()">🔄 Atualizar Status</button>
+                    <button class="btn-config btn-primary" onclick="location.reload()">Atualizar Status</button>
                 </div>
             </div>
             
             <!-- Card: Configuração Manual -->
             <div class="config-card">
-                <h2>⚙️ Conectar à Rede Wi-Fi</h2>
+                <h2>Conectar à Rede Wi-Fi</h2>
                 
                 <form class="config-form" action="/wifi_save_nvs" method="post">
                     <div class="config-form-group">
@@ -66,8 +66,8 @@
                     </div>
                     
                     <div class="form-actions">
-                        <button class="btn-config btn-success" type="submit">🔗 Conectar</button>
-                        <button class="btn-config btn-warning" type="button" onclick="testWifiConnection(document.querySelector('input[name=ssid]').value, document.querySelector('input[name=password]').value)">🧪 Testar Conexão</button>
+                        <button class="btn-config btn-success" type="submit">Conectar</button>
+                        <button class="btn-config btn-warning" type="button" onclick="testWifiConnection(document.querySelector('input[name=ssid]').value, document.querySelector('input[name=password]').value)">Testar Conexão</button>
                     </div>
                 </form>
             </div>
@@ -76,11 +76,11 @@
         <!-- Seção: Redes Disponíveis -->
         <div class="config-container">
             <div class="config-block">
-                <h3>📡 Redes Wi-Fi Disponíveis</h3>
+                <h3>Redes Wi-Fi Disponíveis</h3>
                 
                 <div class="form-actions" style="margin-bottom: 20px;">
-                    <button class="btn-config btn-primary" id="scan-wifi-btn">🔍 Escanear Redes</button>
-                    <a class="btn-config btn-secondary" href="/wifi_select">📋 Modo de Seleção</a>
+                    <button class="btn-config btn-primary" id="scan-wifi-btn">Escanear Redes</button>
+                    <a class="btn-config btn-secondary" href="/wifi_select">Modo de Seleção</a>
                 </div>
                 
                 <div id="wifi-networks-list" class="wifi-networks">
@@ -90,7 +90,7 @@
                 </div>
                 
                 <div class="info-box">
-                    <h4>💡 Dicas para Conexão Wi-Fi</h4>
+                    <h4>Dicas para Conexão Wi-Fi</h4>
                     <ul>
                         <li>Certifique-se de que a rede Wi-Fi está funcionando corretamente</li>
                         <li>Verifique se a senha está correta (diferencia maiúsculas/minúsculas)</li>
@@ -105,20 +105,20 @@
         <!-- Seção: Controles Avançados -->
         <div class="config-container">
             <div class="config-block">
-                <h3>🔧 Controles Avançados</h3>
+                <h3>Controles Avançados</h3>
                 
                 <div class="form-actions">
                     <button class="btn-config btn-warning" onclick="if(confirm('Reiniciar o Wi-Fi pode interromper a conexão atual. Continuar?')) { fetch('/wifi_restart', {method: 'POST'}).then(() => setTimeout(() => location.reload(), 3000)); }">
-                        🔄 Reiniciar Wi-Fi
+                        Reiniciar Wi-Fi
                     </button>
                     
                     <button class="btn-config btn-danger" onclick="if(confirm('Isso desconectará de todas as redes Wi-Fi salvas. Continuar?')) { /* Implementar reset Wi-Fi */ }">
-                        🗑️ Limpar Configurações
+                        Limpar Configurações
                     </button>
                 </div>
                 
                 <div class="warning-text">
-                    ⚠️ Use os controles avançados com cuidado. Podem interromper a conexão atual.
+                    Use os controles avançados com cuidado. Podem interromper a conexão atual.
                 </div>
             </div>
         </div>

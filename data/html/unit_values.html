@@ -9,8 +9,8 @@
 <body>
     <div class="config-device-container">
         <div class="header">
-            <h1 class="config-device-title">📊 Valores da Unidade</h1>
-            <a class="btn btn-voltar" href="/config_unidade">⬅️ Voltar</a>
+            <h1 class="config-device-title">Valores da Unidade</h1>
+            <a class="btn btn-voltar" href="/config_unidade">Voltar</a>
         <div>
             <div class="brand">
                 <div class="brand-main">
@@ -19,11 +19,11 @@
                 </div>
                 <div class="brand-program">Programa: <strong>MCT-01</strong></div>
             </div>
-            <h1>📋 Valores da Unidade</h1>
+            <h1>Valores da Unidade</h1>
         
             <div>
             <div class="config-card">
-                <h2>🔥 Parâmetros de Combustão</h2>
+                <h2>Parâmetros de Combustão</h2>
                 
                 <div class="config-readonly-item">
                     <span class="config-readonly-label">Temperatura:</span>
@@ -48,7 +48,7 @@
             
             <!-- Card: Status do Sistema -->
             <div class="config-card">
-                <h2>⚙️ Status do Sistema</h2>
+                <h2>Status do Sistema</h2>
                 
                 <div class="config-readonly-item">
                     <span class="config-readonly-label">Status Geral:</span>
@@ -75,10 +75,10 @@
         <!-- Gráfico de Tendências -->
         <div class="config-container">
             <div class="config-block">
-                <h3>📈 Tendências (Últimas 24h)</h3>
+                <h3>Tendências (Últimas 24h)</h3>
                 
                 <div class="info-box">
-                    <h4>📊 Resumo das Medições</h4>
+                    <h4>Resumo das Medições</h4>
                     <ul>
                         <li><strong>Temperatura Média:</strong> {{AVG_TEMPERATURE}}°C</li>
                         <li><strong>Temperatura Máxima:</strong> {{MAX_TEMPERATURE}}°C</li>
@@ -89,8 +89,8 @@
                 </div>
                 
                 <div class="form-actions">
-                    <button class="btn-config btn-primary" onclick="location.reload()">🔄 Atualizar Valores</button>
-                    <button class="btn-config btn-warning" onclick="exportData()">📤 Exportar Dados</button>
+                    <button class="btn-config btn-primary" onclick="location.reload()">Atualizar Valores</button>
+                    <button class="btn-config btn-warning" onclick="exportData()">Exportar Dados</button>
                 </div>
             </div>
         </div>
@@ -98,7 +98,7 @@
         <!-- Configurações de Monitoramento -->
         <div class="config-container">
             <div class="config-block">
-                <h3>⚙️ Configurações de Monitoramento</h3>
+                <h3>Configurações de Monitoramento</h3>
                 
                 <form class="config-form" action="/unit_values_save" method="post">
                     <div class="form-group">
@@ -122,8 +122,8 @@
                     </div>
                     
                     <div class="form-actions">
-                        <button class="btn-config btn-success" type="submit">💾 Salvar Configurações</button>
-                        <button class="btn-config btn-secondary" type="reset">🔄 Restaurar Valores</button>
+                        <button class="btn-config btn-success" type="submit">Salvar Configurações</button>
+                        <button class="btn-config btn-secondary" type="reset">Restaurar Valores</button>
                     </div>
                 </form>
             </div>

@@ -184,7 +184,7 @@ uint16_t cj125_get_lambda(spi_device_handle_t spi_cj125, adc_oneshot_unit_handle
 	// retorna o valor lido do conversor no canal 4
 	// uint16_t adc_mean_result = adc_get(adc2_handle, ADC_CHANNEL_7)
 	uint16_t adc_mean_result = adc_get(adc_handle, ADC_CHANNEL_4);
-		
+	adc_mean_result = adjust_adc_result(adc_mean_result);
 	return adc_mean_result;
 }
 

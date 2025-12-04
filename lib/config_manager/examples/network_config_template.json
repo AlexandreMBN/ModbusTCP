@@ -1,0 +1,54 @@
+{
+  "_comment": "Configuração de rede - TCP/IP settings",
+  "ip": "192.168.1.100",
+  "netmask": "255.255.255.0", 
+  "gateway": "192.168.1.1",
+  "dns": "8.8.8.8",
+  "dns_secondary": "8.8.4.4",
+  "hostname": "esp32-device",
+  "use_dhcp": false,
+  "dhcp_timeout_ms": 30000,
+  "tcp_settings": {
+    "max_connections": 10,
+    "keepalive_enable": true,
+    "keepalive_idle": 7200,
+    "keepalive_interval": 75,
+    "keepalive_count": 3
+  },
+  "ntp_settings": {
+    "enabled": true,
+    "server": "pool.ntp.org",
+    "server_secondary": "time.google.com",
+    "timezone": "BRT3BRST,M10.3.0/0,M2.3.0/0",
+    "sync_interval_s": 3600
+  },
+  "mdns_settings": {
+    "enabled": true,
+    "hostname": "esp32-device",
+    "instance_name": "ESP32 Device",
+    "services": [
+      {
+        "service": "_http",
+        "proto": "_tcp",
+        "port": 80,
+        "txt": {
+          "version": "1.0",
+          "model": "ESP32"
+        }
+      }
+    ]
+  },
+  "firewall": {
+    "enabled": false,
+    "allow_ping": true,
+    "blocked_ports": [],
+    "allowed_ips": []
+  },
+  "description": "Configuração completa de rede TCP/IP",
+  "metadata": {
+    "created_by": "config_manager_library",
+    "version": "1.0.0",
+    "last_modified": "2024-11-10T10:00:00Z",
+    "environment": "production"
+  }
+}

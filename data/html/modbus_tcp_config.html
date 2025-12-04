@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuração Modbus TCP</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-running { background-color: #4caf50; }
+        .status-stopped { background-color: #f44336; }
+        .status-initializing { background-color: #ff9800; }
+        .status-error { background-color: #f44336; animation: blink 1s infinite; }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .config-section {
+            background: #f9f9f9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .form-group {
+            margin: 15px 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input[type="number"],
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4caf50;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #0c5460;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Configuração Modbus TCP</h1>
+        
+        <div class="info-box">
+            <strong>Informação:</strong>
+            <p>O Modbus TCP permite comunicação via rede Ethernet/WiFi na porta 502 (padrão Modbus).</p>
+            <p>Os registradores são <strong>compartilhados</strong> com o Modbus RTU (Serial).</p>
+        </div>
+        
+        <div class="config-section">
+            <h3>Status Atual</h3>
+            <p id="statusDisplay">
+                <span class="status-indicator status-stopped"></span>
+                <span id="statusText">Carregando...</span>
+            </p>
+            <button onclick="refreshStatus()" class="btn-secondary">Atualizar Status</button>
+        </div>
+        
+        <form id="configForm">
+            <div class="config-section">
+                <h3>Configurações</h3>
+                
+                <div class="form-group">
+                    <label for="enabled">
+                        Habilitar Modbus TCP
+                        <span style="float: right;">
+                            <label class="switch">
+                                <input type="checkbox" id="enabled" name="enabled">
+                                <span class="slider"></span>
+                            </label>
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="port">Porta TCP:</label>
+                    <input type="number" id="port" name="port" value="502" min="1" max="65535" required>
+                    <small>Padrão: 502 (porta padrão Modbus TCP)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="max_connections">Conexões Simultâneas:</label>
+                    <input type="number" id="max_connections" name="max_connections" value="5" min="1" max="10" required>
+                    <small>Máximo de clientes conectados simultaneamente (1-10)</small>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <strong>Atenção:</strong>
+                <p>Após salvar as configurações, é necessário <strong>reiniciar o dispositivo</strong> para aplicar as mudanças.</p>
+                <p>Certifique-se de que o WiFi está conectado antes de habilitar o Modbus TCP.</p>
+            </div>
+            
+            <div class="btn-group">
+                <button type="button" onclick="window.location.href='/admin'" class="btn-secondary">
+                    ← Voltar
+                </button>
+                <button type="submit" class="btn-primary">
+                    Salvar Configuração
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        // Carrega configuração atual ao carregar a página
+        window.onload = function() {
+            loadCurrentConfig();
+            refreshStatus();
+        };
+        
+        // Carrega configuração atual
+        function loadCurrentConfig() {
+            fetch('/api/modbus_tcp_config')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success || data.enabled !== undefined) {
+                        document.getElementById('enabled').checked = data.enabled || false;
+                        document.getElementById('port').value = data.port || 502;
+                        document.getElementById('max_connections').value = data.max_connections || 5;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar configuração:', error);
+                    alert('Erro ao carregar configuração atual');
+                });
+        }
+        
+        // Atualiza status
+        function refreshStatus() {
+            fetch('/api/modbus_tcp/status')
+                .then(response => response.json())
+                .then(data => {
+                    const indicator = document.querySelector('.status-indicator');
+                    const statusText = document.getElementById('statusText');
+                    
+                    // Remove classes antigas
+                    indicator.className = 'status-indicator';
+                    
+                    // Adiciona classe baseada no status
+                    switch(data.status) {
+                        case 'running':
+                            indicator.classList.add('status-running');
+                            statusText.textContent = `${data.message}`;
+                            if (data.port) {
+                                statusText.textContent += ` (Porta ${data.port})`;
+                            }
+                            break;
+                        case 'initializing':
+                            indicator.classList.add('status-initializing');
+                            statusText.textContent = `⏳ ${data.message}`;
+                            break;
+                        case 'error':
+                            indicator.classList.add('status-error');
+                            statusText.textContent = `${data.message}`;
+                            break;
+                        default:
+                            indicator.classList.add('status-stopped');
+                            statusText.textContent = `${data.message || 'Parado'}`;
+                            if (data.enabled === false) {
+                                statusText.textContent += ' (Desabilitado)';
+                            }
+                            break;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao obter status:', error);
+                    document.getElementById('statusText').textContent = 'Erro ao obter status';
+                });
+        }
+        
+        // Salva configuração
+        document.getElementById('configForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const config = {
+                enabled: document.getElementById('enabled').checked,
+                port: parseInt(document.getElementById('port').value),
+                max_connections: parseInt(document.getElementById('max_connections').value)
+            };
+            
+            fetch('/api/modbus_tcp_config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(config)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    if (confirm('Deseja reiniciar o dispositivo agora para aplicar as mudanças?')) {
+                        window.location.href = '/wifi_restart';
+                    }
+                } else {
+                    alert('❌ ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao salvar:', error);
+                alert('❌ Erro ao salvar configuração');
+            });
+        });
+    </script>
+</body>
+</html>

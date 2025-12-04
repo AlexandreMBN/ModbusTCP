@@ -1,0 +1,29 @@
+{
+  "name": "AP Manager",
+  "version": "1.0.0",
+  "description": "Complete Access Point management library for ESP32 with ESP-IDF",
+  "keywords": "wifi, access point, ap, esp32, esp-idf, network, configuration",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "authors": [
+    {
+      "name": "AP Manager Library",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "dependencies": {
+  },
+  "frameworks": "espidf",
+  "platforms": "espressif32",
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src"
+  },
+  "export": {
+    "include": "include/*"
+  }
+}

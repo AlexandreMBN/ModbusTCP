@@ -9,8 +9,8 @@
 <body>
     <div class="config-device-container">
         <div class="header">
-            <h1 class="config-device-title">📡 Configuração de Comunicação Modbus</h1>
-            <a class="btn btn-voltar" href="/admin">⬅️ Voltar</a>
+            <h1 class="config-device-title">Configuração de Comunicação Modbus</h1>
+            <a class="btn btn-voltar" href="/admin">Voltar</a>
         <div>
             <div class="brand">
                 <div class="brand-main">
@@ -19,11 +19,12 @@
                 </div>
                 <div class="brand-program">Programa: <strong>MCT-01</strong></div>
             </div>
-            <h1>📊 Modbus</h1>
+            <h1>Modbus</h1>
         
             <div>
+            <form action="/modbus_registers_save" method="post">
             <div class="config-card">
-                <h2>📊 Registradores 2000 - Dados do Sistema (Somente Leitura)</h2>
+                <h2>Registradores 2000 - Dados do Sistema (Somente Leitura)</h2>
                 <div class="registers-grid">
                     <div class="config-form-group">
                         <label class="config-label">2000 - Valor de Dados:</label>
@@ -34,7 +35,7 @@
 
             <!-- Registradores 4000 - Valores Lambda/Heat (Editáveis) -->
             <div class="config-card">
-                <h2>🔥 Registradores 4000 - Controle Lambda/Heat</h2>
+                <h2>Registradores 4000 - Controle Lambda/Heat</h2>
                 <div class="registers-grid">
                     <div class="config-form-group">
                         <label class="config-label">4000 - Lambda Value:</label>
@@ -82,7 +83,7 @@
 
             <!-- Registradores 6000 - Configuração DAC (Editáveis) -->
             <div class="config-card">
-                <h2>📡 Registradores 6000 - Configuração DAC</h2>
+                <h2>Registradores 6000 - Configuração DAC</h2>
                 <div class="registers-grid">
                     <div class="config-form-group">
                         <label class="config-label">6000 - Max DAC0:</label>
@@ -109,7 +110,7 @@
 
             <!-- Registradores 9000 - Especificações da Unidade (Editáveis) -->
             <div class="config-card">
-                <h2>🏷️ Registradores 9000 - Especificações da Unidade</h2>
+                <h2>Registradores 9000 - Especificações da Unidade</h2>
                 <div class="registers-grid">
                     <div class="config-form-group">
                         <label class="config-label">9000 - Valor Zero:</label>
@@ -196,9 +197,9 @@
 
             <!-- Botões de Ação -->
             <div class="form-actions" style="text-align: center; margin-top: 30px;">
-                <button class="btn-config btn-success" type="submit">💾 Salvar Registradores</button>
-                <a class="btn-config btn-secondary" href="/admin">↩️ Cancelar</a>
-                <button class="btn-config btn-warning" type="button" onclick="location.reload()">🔄 Recarregar</button>
+                <button class="btn-config btn-success" type="submit">Salvar Registradores</button>
+                <a class="btn-config btn-secondary" href="/admin">Cancelar</a>
+                <button class="btn-config btn-warning" type="button" onclick="location.reload()">Recarregar</button>
             </div>
         </form>
     </div>

@@ -1,0 +1,121 @@
+{
+  "name": "SPIFFS File Manager",
+  "version": "1.0.0",
+  "description": "Biblioteca completa para gerenciamento de arquivos SPIFFS e servidor web estático no ESP32. Inclui cache de arquivos, processamento de templates, detecção automática de MIME types, handlers HTTP customizáveis e sistema de estatísticas.",
+  "keywords": [
+    "esp32",
+    "spiffs",
+    "webserver",
+    "http",
+    "file-manager",
+    "static-files",
+    "template-engine",
+    "mime-types",
+    "cache",
+    "esp-idf",
+    "platformio"
+  ],
+  "authors": [
+    {
+      "name": "ESP32 Development Team",
+      "email": "dev@esp32.com"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/esp32/spiffs-file-manager",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esp32/spiffs-file-manager.git"
+  },
+  "frameworks": ["espidf"],
+  "platforms": ["espressif32"],
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src",
+    "srcFilter": [
+      "+<*>",
+      "-<examples/>",
+      "-<test/>"
+    ]
+  },
+  "dependencies": {
+    "esp_http_server": "*",
+    "esp_spiffs": "*",
+    "nvs_flash": "*",
+    "json": "*"
+  },
+  "export": {
+    "include": [
+      "include/spiffs_file_manager.h"
+    ]
+  },
+  "examples": [
+    {
+      "name": "Basic Usage",
+      "base": "examples",
+      "files": [
+        "spiffs_file_manager_example.c"
+      ]
+    }
+  ],
+  "headers": "spiffs_file_manager.h",
+  "config": {
+    "cache_enabled": {
+      "type": "bool",
+      "default": true,
+      "description": "Habilitar cache de arquivos em memória"
+    },
+    "max_file_size": {
+      "type": "integer",
+      "default": 65536,
+      "description": "Tamanho máximo de arquivo em bytes (64KB)"
+    },
+    "max_cache_entries": {
+      "type": "integer", 
+      "default": 20,
+      "description": "Número máximo de arquivos no cache"
+    },
+    "development_headers": {
+      "type": "bool",
+      "default": true,
+      "description": "Incluir headers de desenvolvimento (no-cache, etc)"
+    },
+    "base_path": {
+      "type": "string",
+      "default": "/spiffs",
+      "description": "Caminho base do sistema de arquivos SPIFFS"
+    }
+  },
+  "features": [
+    "Cache inteligente de arquivos",
+    "Detecção automática de MIME types",
+    "Sistema de templates com placeholders",
+    "Handlers HTTP pré-configurados",
+    "Preprocessors customizáveis",
+    "Estatísticas de uso",
+    "Headers de segurança automáticos",
+    "Suporte a desenvolvimento e produção",
+    "Integração fácil com ESP-IDF",
+    "Configuração flexível"
+  ],
+  "usage": {
+    "initialization": {
+      "description": "Inicializar a biblioteca",
+      "code": "spiffs_manager_config_t config;\nspiffs_manager_get_default_config(&config);\nspiffs_manager_init(&config);"
+    },
+    "file_loading": {
+      "description": "Carregar arquivo do SPIFFS",
+      "code": "char *content = NULL;\nsize_t length = 0;\nspiffs_manager_result_t result = spiffs_manager_load_file(\"index.html\", &content, &length);"
+    },
+    "http_handler": {
+      "description": "Registrar handlers HTTP",
+      "code": "spiffs_manager_register_default_handlers(server);\nspiffs_manager_register_custom_handler(server, \"/api/*\", HTTP_GET, my_handler);"
+    }
+  },
+  "performance": {
+    "memory_usage": "~8KB RAM base + cache configurável",
+    "file_cache": "Até 20 arquivos em cache por padrão",
+    "max_file_size": "64KB por arquivo (configurável)",
+    "http_handlers": "Múltiplos handlers simultâneos"
+  }
+}

@@ -7,101 +7,146 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <div>
-        <div class="top-bar" style="display:flex; align-items:center; justify-content:flex-start; gap:12px; margin-bottom:12px;">
-            <button class="back-btn" onclick="history.back()" aria-label="Voltar">◀ Voltar</button>
-            <h1>⚙️ Painel de Controle</h1>
+    <!-- Cabeçalho Turquesa -->
+    <div class="header-bar">
+        <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech" class="header-logo">
+        <div class="header-title">
+            <h1>Medidor de Combustão</h1>
+            <p>Modelo MCT-1</p>
+        </div>
+    </div>
+
+    <!-- Container Principal: Sidebar + Conteúdo -->
+    <div class="main-container">
+        <!-- Menu Lateral Amarelo -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Status</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="/info">Informações do Dispositivo</a></li>
+                    <li><a href="/admin" class="active">Gerenciamento de Configurações</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Configurações</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="/config_unidade">Configuração de Dispositivo</a></li>
+                    <li><a href="/mqtt_config">Configuração MQTT/TLS</a></li>
+                    <li><a href="/modbus">Registradores Modbus</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <ul class="sidebar-menu">
+                    <li><a href="/logout">Logout</a></li>
+                </ul>
+            </div>
         </div>
 
-        <div class="brand">
-            <div class="brand-main">
-                <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
-                <h2 class="brand-company">Infitech - Automação</h2>
-            </div>
-            <div class="brand-program">Programa: <strong>MCT-01</strong></div>
-        </div>
+        <!-- Área de Conteúdo -->
+        <div class="content-area">
+            <h2 class="page-title">Basic Status</h2>
 
-        <!-- Informações do Usuário -->
-        <div class="config-card" style="margin: 15px 0; padding: 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; border-left: 4px solid #28a745;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h3 style="margin: 0; color: #1C402C; font-size: 14px;">{{USER_LEVEL}}</h3>
-                    <p style="margin: 5px 0 0 0; color: #6c757d; font-size: 12px;">{{USER_PERMISSIONS}}</p>
-                </div>
-                <a href="/logout" style="background: #dc3545; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 12px;">🚪 Sair</a>
+            <!-- Informações do Usuário -->
+            <div class="info-card">
+                <p><strong>Usuário:</strong> {{USER_LEVEL}} | {{USER_PERMISSIONS}}</p>
             </div>
-        </div>
 
-        <!-- 🔷 CONTEÚDO PARA USUÁRIO PADRÃO (adm) -->
-        <div {{SHOW_BASIC_CONTENT}}>
-            <div>
-                <a href="/config_unidade">
-                    🔧 Configuração de Dispositivo
-                </a>
-            </div>
-            
-            <div>
-                <a href="/mqtt_config">
-                    📡 Configuração MQTT
-                </a>
-            </div>
-            
-            <!-- Registradores 2000 - Apenas para usuário padrão -->
-            <div class="config-card" style="margin: 20px 0; text-align: left;">
-                <h2 style="color: #1C402C; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #7DA641; padding-bottom: 8px;">📊 Registradores de Monitoramento (2000)</h2>
-                
-                <div style="margin-bottom: 20px;">
-                    <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">📈 Valores de Leitura (Somente Visualização)</h3>
+            <!-- CONTEÚDO PARA USUÁRIO PADRÃO (adm) -->
+            <div {{SHOW_BASIC_CONTENT}}>
+                <!-- Registradores 2000 - Apenas para usuário padrão -->
+                <div class="info-card">
+                    <h2>Registradores de Monitoramento (2000)</h2>
+                    <h3>Valores de Leitura (Somente Visualização)</h3>
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">2000 - Valor Principal:</span>
-                            <span class="info-value" style="background: #f8f9fa; padding: 6px 12px; border-radius: 4px; border: 1px solid #dee2e6; display: inline-block; min-width: 80px; text-align: center;">{{REG2000_0}}</span>
+                            <span class="info-value">{{REG2000_0}}</span>
                         </div>
                     </div>
-                    <p style="color: #6c757d; font-size: 12px; margin-top: 10px;">
-                        ℹ️ Estes valores são atualizados automaticamente pelo sistema.
+                    <p style="color: #666; font-size: 12px; margin-top: 15px;">
+                        Estes valores são atualizados automaticamente pelo sistema.
                     </p>
                 </div>
-            </div>
 
-            <!-- Seção de Alarmes - Para usuário padrão -->
-            <div class="config-card" style="margin: 20px 0; text-align: left;">
-                <h2 style="color: #dc3545; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #dc3545; padding-bottom: 8px;">🚨 Alarmes do Sistema</h2>
-                
-                <div style="margin-bottom: 20px;">
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;">
-                        <h3 style="color: #856404; font-size: 14px; margin: 0 0 10px 0;">⚠️ Status dos Alarmes</h3>
-                        <p style="color: #6c757d; font-size: 12px; margin: 0;">
+                <!-- Seção de Alarmes - Para usuário padrão -->
+                <div class="info-card">
+                    <h2>Alarmes do Sistema</h2>
+                    <div style="background: #FFF9E6; padding: 15px; border-radius: 4px; border-left: 4px solid #FFC107;">
+                        <h3 style="color: #856404; margin: 0 0 10px 0;">Status dos Alarmes</h3>
+                        <p style="color: #856404; font-size: 13px; margin: 0;">
                             Funcionalidade em desenvolvimento. Em breve será possível visualizar e gerenciar alarmes do sistema.
                         </p>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 🔷 CONTEÚDO PARA ADMINISTRADOR (root) -->
-        <div {{SHOW_ADMIN_CONTENT}}>
-            <div>
-                <a href="/config_unidade">
-                    🔧 Configuração de Dispositivo
-                </a>
-            </div>
-            
-            <div>
-                <a href="/mqtt_config">
-                    🔐 Configurar MQTT/TLS
-                </a>
-            </div>
-            
-            <!-- Seção Completa dos Registradores Modbus - Apenas para Admin -->
-            <div class="config-card" style="margin: 20px 0; text-align: left;">
-                <h2 style="color: #1C402C; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #7DA641; padding-bottom: 8px;">📊 Registradores Modbus - Painel Completo</h2>
+            <!-- CONTEÚDO PARA ADMINISTRADOR (root) -->
+            <div {{SHOW_ADMIN_CONTENT}}>
+                <!-- Seção de Upload de Configurações JSON -->
+                <div class="info-card">
+                    <h2>Gerenciamento de Configurações</h2>
+                    
+                    <!-- Upload de Arquivos JSON -->
+                    <details style="margin-bottom: 20px;">
+                        <summary style="cursor: pointer; font-weight: 600; color: #2C4A1E;">Upload de Configurações JSON</summary>
+                        <form id="configUploadForm" enctype="multipart/form-data" style="background: #F9F9F9; padding: 20px; border-radius: 4px; margin-top: 15px;">
+                            <div style="margin-bottom: 15px;">
+                                <label for="configType">Tipo de Configuração:</label>
+                                <select id="configType" name="configType" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                    <option value="">Selecione o tipo...</option>
+                                    <option value="rtu">RTU Config (Modbus RTU)</option>
+                                    <option value="ap">AP Config (WiFi Access Point)</option>
+                                    <option value="sta">STA Config (WiFi Station)</option>
+                                    <option value="mqtt">MQTT Config (Cliente MQTT)</option>
+                                    <option value="network">Network Config (Rede)</option>
+                                    <option value="main">Main Config (General Configuration)</option>
+                                </select>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label for="configFile">Arquivo JSON:</label>
+                                <input type="file" id="configFile" name="configFile" accept=".json" style="width: 100%; padding: 8px;">
+                                <small style="color: #666; font-size: 11px; display: block; margin-top: 5px;">
+                                    Apenas arquivos .json são aceitos. Tamanho máximo: 10KB
+                                </small>
+                            </div>
+                            
+                            <div style="text-align: center; margin-top: 20px;">
+                                <button type="button" onclick="uploadConfig()">Upload e Aplicar</button>
+                                <button type="button" onclick="resetUploadForm()" style="background: #999;">Limpar</button>
+                            </div>
+                        </form>
+                        <div id="uploadStatus" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+                    </details>
+                    
+                    <!-- Download de Configurações Atuais -->
+                    <details style="margin-top: 20px;">
+                        <summary style="cursor: pointer; font-weight: 600; color: #2C4A1E;">Download de Configurações Atuais</summary>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 15px;">
+                            <button onclick="downloadConfig('rtu')" style="font-size: 12px;">RTU Config</button>
+                            <button onclick="downloadConfig('ap')" style="font-size: 12px;">AP Config</button>
+                            <button onclick="downloadConfig('sta')" style="font-size: 12px;">STA Config</button>
+                            <button onclick="downloadConfig('mqtt')" style="font-size: 12px;">MQTT Config</button>
+                            <button onclick="downloadConfig('network')" style="font-size: 12px;">Network Config</button>
+                            <button onclick="downloadConfig('main')" style="font-size: 12px;">Main Config</button>
+                        </div>
+                        <small style="color: #666; font-size: 11px; display: block; margin-top: 10px; text-align: center;">
+                            Faça backup das configurações atuais antes de fazer uploads
+                        </small>
+                    </details>
+                </div>
+                
+                <!-- Seção Completa dos Registradores Modbus - Apenas para Admin -->
+                <div class="info-card">
+                    <h2>Registradores Modbus - Painel Completo</h2>
                 
                 <form action="/modbus_registers_save" method="post" style="margin: 0;">
                     
                     <!-- Registradores 1000 - Configuração RTU -->
                     <div style="margin-bottom: 20px;">
-                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">⚙️ Configuração RTU (1000)</h3>
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">Configuração RTU (1000)</summary>
+                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">Configuração RTU (1000)</h3>
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">1000 - Baudrate:</span>
@@ -119,22 +164,28 @@
                                 </select>
                             </div>
                         </div>
+                        </details>
                     </div>
 
                     <!-- Registradores 2000 - Dados (Somente Leitura) -->
                     <div style="margin-bottom: 20px;">
-                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">📊 Dados do Sistema (2000) - Somente Leitura</h3>
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">Dados do Sistema (2000) - Somente Leitura</summary>
+                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">Dados do Sistema (2000) - Somente Leitura</h3>
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">2000 - Valor de Dados:</span>
                                 <span class="info-value readonly-input">{{REG2000_0}}</span>
                             </div>
                         </div>
+                        </details>
                     </div>
 
                     <!-- Registradores 4000 - Lambda/Heat -->
                     <div style="margin-bottom: 20px;">
-                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">🔥 Controle Lambda/Heat (4000)</h3>
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">Controle Lambda/Heat (4000)</summary>
+                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">Controle Lambda/Heat (4000)</h3>
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">4000 - Lambda Value:</span>
@@ -175,11 +226,13 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </details>
+                 </div>
 
                     <!-- Registradores 6000 - Configuração DAC -->
                     <div style="margin-bottom: 20px;">
-                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">📡 Configuração DAC (6000)</h3>
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">Configuração DAC (6000)</summary>
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">6000 - Max DAC0:</span>
@@ -198,11 +251,13 @@
                                 <input class="config-input" type="number" name="reg6000_4" value="{{REG6000_4}}" step="0.01" style="min-width: 100px; font-size: 12px;">
                             </div>
                         </div>
-                    </div>
+                    </details>
+                </div>
 
                     <!-- Registradores 9000 - Especificações da Unidade -->
                     <div style="margin-bottom: 20px;">
-                        <h3 style="color: #1C402C; font-size: 14px; margin-bottom: 10px;">🏷️ Especificações da Unidade (9000)</h3>
+                        <details>
+                            <summary style="color: #1C402C; font-size: 14px; margin-bottom: 10px; cursor: pointer; outline: none;">Especificações da Unidade (9000)</summary>
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">9000 - Valor Zero:</span>
@@ -266,32 +321,29 @@
                                 <input class="config-input" type="number" name="reg9000_19" value="{{REG9000_19}}" style="min-width: 100px; font-size: 12px;">
                             </div>
                         </div>
+                    </details>
                     </div>
 
                     <!-- Botões de Ação -->
                     <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #7DA641;">
-                        <button class="btn-config btn-primary" type="submit" style="margin: 5px;">💾 Salvar Todas as Alterações</button>
-                        <button class="btn-config btn-warning" type="button" onclick="location.reload()" style="margin: 5px;">🔄 Recarregar Valores</button>
+                        <button class="btn-config btn-primary" type="submit" style="margin: 5px;">Salvar Todas as Alterações</button>
+                        <button class="btn-config btn-warning" type="button" onclick="location.reload()" style="margin: 5px;">Recarregar Valores</button>
                     </div>
                 </form>
             </div>
             
-            <div>
+            <!-- <div>
                 <a href="/info">
-                    ℹ️ Informações do Sistema
+                    Informações do Sistema
                 </a>
-            </div>
-        </div>
-
-        <!-- 🔷 LINKS COMUNS PARA AMBOS OS USUÁRIOS -->
-        <div style="margin-top: 20px; text-align: center;">
-            <a href="/info" style="display: inline-block; margin: 5px;">
-                ℹ️ Informações do Sistema
-            </a>
+            </div> -->
         </div>
         </div>
+        <!-- Fim content-area -->
     </div>
+    <!-- Fim main-container -->
     
     <script src="/js/scripts.js"></script>
+    <script src="/js/config_manager.js"></script>
 </body>
 </html>

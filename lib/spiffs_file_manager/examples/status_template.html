@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{DEVICE_NAME}} - Status do Sistema</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .status-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .status-card {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            width: {{CACHE_HIT_RATE}}%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-container">
+        <header>
+            <h1>{{DEVICE_NAME}}</h1>
+            <p>Status do Sistema em Tempo Real</p>
+        </header>
+
+        <div class="status-card">
+            <h3>Informações do Dispositivo</h3>
+            <p><strong>Nome:</strong> {{DEVICE_NAME}}</p>
+            <p><strong>Endereço IP:</strong> {{IP_ADDRESS}}</p>
+            <p><strong>Tempo de Atividade:</strong> {{UPTIME}}</p>
+            <p><strong>Versão Firmware:</strong> {{FIRMWARE_VERSION}}</p>
+        </div>
+
+        <div class="status-card">
+            <h3>Estatísticas do Servidor Web</h3>
+            <p><strong>Arquivos Servidos:</strong> <span class="status-value">{{FILES_SERVED}}</span></p>
+            <p><strong>Cache Hits:</strong> <span class="status-value">{{CACHE_HITS}}</span></p>
+            <p><strong>Cache Misses:</strong> <span class="status-value">{{CACHE_MISSES}}</span></p>
+            <p><strong>Total de Bytes:</strong> <span class="status-value">{{TOTAL_BYTES}}</span></p>
+            
+            <p><strong>Taxa de Acerto do Cache:</strong></p>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <p style="text-align: center;">{{CACHE_HIT_RATE}}%</p>
+        </div>
+
+        <div class="status-card">
+            <h3>Memória e Armazenamento</h3>
+            <p><strong>RAM Livre:</strong> <span class="status-value">{{FREE_MEMORY}}</span></p>
+            <p><strong>SPIFFS Usado:</strong> <span class="status-value">{{SPIFFS_USED}}</span></p>
+            <p><strong>SPIFFS Total:</strong> <span class="status-value">{{SPIFFS_TOTAL}}</span></p>
+        </div>
+
+        <div class="status-card">
+            <h3>Conectividade</h3>
+            <p><strong>Status WiFi:</strong> {{WIFI_STATUS}}</p>
+            <p><strong>SSID:</strong> {{WIFI_SSID}}</p>
+            <p><strong>Força do Sinal:</strong> {{WIFI_RSSI}} dBm</p>
+            <p><strong>Clientes Conectados:</strong> {{CONNECTED_CLIENTS}}</p>
+        </div>
+
+        <div class="status-card">
+            <h3>Sensores e I/O</h3>
+            <p><strong>Temperatura:</strong> {{TEMPERATURE}}°C</p>
+            <p><strong>Umidade:</strong> {{HUMIDITY}}%</p>
+            <p><strong>Pressão:</strong> {{PRESSURE}} hPa</p>
+            <p><strong>Status GPIO:</strong> {{GPIO_STATUS}}</p>
+        </div>
+
+        <div class="status-card">
+            <h3>Logs do Sistema</h3>
+            <div style="background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 5px; font-family: monospace; max-height: 200px; overflow-y: auto;">
+                {{SYSTEM_LOGS}}
+            </div>
+        </div>
+
+        <footer style="text-align: center; margin-top: 30px; color: #666;">
+            <p>Última atualização: {{LAST_UPDATE}}</p>
+            <p>
+                <a href="/">🏠 Início</a> |
+                <a href="/config">⚙️ Configurações</a> |
+                <a href="/api/status">📊 API JSON</a> |
+                <a href="/admin">🔧 Admin</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Auto-refresh da página a cada 30 segundos
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+
+        // Atualizar timestamp
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const timestamp = now.toLocaleString('pt-BR');
+            
+            // Se não houver timestamp do servidor, usar timestamp local
+            const lastUpdate = document.querySelector('footer p:last-child').previousElementSibling;
+            if (lastUpdate.textContent.includes('{{LAST_UPDATE}}')) {
+                lastUpdate.innerHTML = 'Última atualização: ' + timestamp;
+            }
+        });
+
+        // Função para atualizar via AJAX (opcional)
+        function updateStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.status-value').textContent = data.files_served;
+                    // Atualizar outros campos conforme necessário
+                })
+                .catch(error => console.error('Erro ao atualizar:', error));
+        }
+
+        // Atualizar a cada 10 segundos via AJAX
+        setInterval(updateStatus, 10000);
+    </script>
+</body>
+</html>

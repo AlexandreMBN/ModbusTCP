@@ -1,0 +1,12 @@
+{
+  "broker_url": "mqtt://192.168.1.100:1883",
+  "client_id": "esp32_medidor_001",
+  "username": "user",
+  "password": "password",
+  "enabled": true,
+  "keep_alive": 60,
+  "clean_session": true,
+  "port": 1883,
+  "qos": 1,
+  "description": "Configuração MQTT - Salva em /data/config/mqtt_config.json"
+}

@@ -35,20 +35,8 @@ typedef struct {
     bool valid;
 } sonda_data_t;
 
-// Estrutura para configuração MQTT
-typedef struct {
-    char broker_url[128];
-    char client_id[32];
-    char username[32];
-    char password[64];
-    uint16_t port;
-    uint8_t qos;
-    bool retain;
-    bool tls_enabled; /* habilita TLS (mqtts) */
-    char ca_path[128]; /* caminho para CA PEM em SPIFFS, ex: /spiffs/ca.pem */
-    bool enabled;
-    uint32_t publish_interval_ms;
-} mqtt_config_t;
+// Incluir estrutura MQTT do config_manager
+#include "config_manager.h"
 
 // Enums para status MQTT
 typedef enum {

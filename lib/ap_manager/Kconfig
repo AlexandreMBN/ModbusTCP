@@ -1,0 +1,72 @@
+# Kconfig para configurações opcionais da biblioteca AP Manager
+
+menu "AP Manager Configuration"
+
+    config AP_MANAGER_MAX_APS
+        int "Maximum number of APs in scan results"
+        range 5 50
+        default 20
+        help
+            Maximum number of access points that can be stored in scan results.
+
+    config AP_MANAGER_DEFAULT_SSID
+        string "Default AP SSID"
+        default "ESP32-MCT-01"
+        help
+            Default SSID for the Access Point when no configuration is saved.
+
+    config AP_MANAGER_DEFAULT_PASSWORD
+        string "Default AP Password" 
+        default "12345678"
+        help
+            Default password for the Access Point when no configuration is saved.
+            Must be at least 8 characters for WPA security.
+
+    config AP_MANAGER_DEFAULT_IP
+        string "Default AP IP Address"
+        default "192.168.4.1"
+        help
+            Default IP address for the Access Point.
+
+    config AP_MANAGER_CONFIG_AUTO_SAVE
+        bool "Auto-save configuration changes"
+        default y
+        help
+            Automatically save configuration changes to both SPIFFS and NVS.
+
+    config AP_MANAGER_ENABLE_AUTO_SWITCH
+        bool "Enable automatic switch to STA-only mode"
+        default y
+        help
+            Automatically switch from AP+STA to STA-only mode when connected to WiFi.
+
+    config AP_MANAGER_AUTO_SWITCH_TIMEOUT
+        int "Auto-switch timeout (seconds)"
+        depends on AP_MANAGER_ENABLE_AUTO_SWITCH
+        range 10 300
+        default 60
+        help
+            Timeout in seconds to wait for STA connection before giving up auto-switch.
+
+    config AP_MANAGER_SCAN_TIMEOUT
+        int "WiFi scan timeout (milliseconds)"
+        range 1000 10000
+        default 5000
+        help
+            Timeout for WiFi scan operations.
+
+    config AP_MANAGER_ENABLE_STATIC_IP
+        bool "Enable static IP configuration"
+        default y
+        help
+            Enable support for static IP configuration in Station mode.
+
+    config AP_MANAGER_LOG_LEVEL
+        int "Log level for AP Manager"
+        range 0 5
+        default 3
+        help
+            Log level for AP Manager component:
+            0 = None, 1 = Error, 2 = Warning, 3 = Info, 4 = Debug, 5 = Verbose
+
+endmenu

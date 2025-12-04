@@ -1,0 +1,25 @@
+{
+  "_comment": "Configuração WiFi Station - Para conectar em redes existentes",
+  "ssid": "MeuWiFi",
+  "password": "senhadowifi",
+  "enable_static_ip": false,
+  "static_ip": "192.168.1.100",
+  "subnet": "255.255.255.0",
+  "gateway": "192.168.1.1",
+  "dns": "8.8.8.8",
+  "dns_secondary": "8.8.4.4",
+  "auto_connect": true,
+  "retry_attempts": 5,
+  "retry_delay_ms": 5000,
+  "scan_method": "fast",
+  "sort_method": "signal",
+  "rssi_threshold": -80,
+  "auth_mode": "wpa2_psk",
+  "description": "Configuração para conectar em rede WiFi existente",
+  "metadata": {
+    "created_by": "config_manager_library",
+    "version": "1.0.0",
+    "last_modified": "2024-11-10T10:00:00Z",
+    "environment": "production"
+  }
+}

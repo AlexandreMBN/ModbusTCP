@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informações do Dispositivo - Medidor de Combustão</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Cabeçalho Turquesa -->
+    <div class="header-bar">
+        <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech" class="header-logo">
+        <div class="header-title">
+            <h1>Medidor de Combustão</h1>
+            <p>Modelo MCT-1</p>
+        </div>
+    </div>
+
+    <!-- Container Principal: Sidebar + Conteúdo -->
+    <div class="main-container">
+        <!-- Menu Lateral Amarelo -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Status</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="/info">Informações do Dispositivo</a></li>
+                    <li><a href="/admin">Gerenciamento de Configurações</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Configurações</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="/config_unidade">Configuração de Dispositivo</a></li>
+                    <li><a href="/mqtt_config">Configuração MQTT/TLS</a></li>
+                    <li><a href="/modbus">Registradores Modbus</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <ul class="sidebar-menu">
+                    <li><a href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Área de Conteúdo -->
+        <div class="content-area">
+            <h2 class="page-title">Informações do Dispositivo</h2>
+
+            <!-- Informações do Usuário -->
+            <div class="info-card" style="background: linear-gradient(135deg, #F0F8F6 0%, #E8F5F3 100%); border-left: 4px solid #4DB8AC;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin: 0; color: #2C4A1E; font-size: 16px; font-weight: bold;">{{USER_LEVEL}}</h3>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 13px;">{{USER_PERMISSIONS}}</p>
+                    </div>
+                    <a href="/logout" style="background: #DC3545; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: 500;">Sair</a>
+                </div>
+            </div>
+
+            <!-- CONTEÚDO PARA USUÁRIO PADRÃO (adm) -->
+            <div {{SHOW_BASIC_CONTENT}}>
+                <!-- Links de Acesso Rápido -->
+                <div class="info-card">
+                    <h2>Acesso Rápido</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="/config_unidade" style="display: block; padding: 15px; background: #F9F9F9; border-left: 3px solid #4DB8AC; border-radius: 4px; text-decoration: none; color: #2C4A1E; font-weight: 600; transition: all 0.2s;">
+                            Configuração de Dispositivo
+                        </a>
+                        <a href="/mqtt_config" style="display: block; padding: 15px; background: #F9F9F9; border-left: 3px solid #4DB8AC; border-radius: 4px; text-decoration: none; color: #2C4A1E; font-weight: 600; transition: all 0.2s;">
+                            Configuração MQTT
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Registradores 2000 - Apenas para usuário padrão -->
+                <div class="info-card">
+                    <h2>Registradores de Monitoramento (2000)</h2>
+                    <h3>Valores de Leitura (Somente Visualização)</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">2000 - Valor Principal:</span>
+                            <span class="info-value">{{REG2000_0}}</span>
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 12px; margin-top: 15px; font-style: italic;">
+                        Estes valores são atualizados automaticamente pelo sistema.
+                    </p>
+                </div>
+
+                <!-- Seção de Alarmes - Para usuário padrão -->
+                <div class="info-card">
+                    <h2>Alarmes do Sistema</h2>
+                    <div style="background: #FFF9E6; padding: 15px; border-radius: 4px; border-left: 4px solid #FFC107;">
+                        <h3 style="color: #856404; margin: 0 0 10px 0; font-size: 15px;">Status dos Alarmes</h3>
+                        <p style="color: #856404; font-size: 13px; margin: 0;">
+                            Funcionalidade em desenvolvimento. Em breve será possível visualizar e gerenciar alarmes do sistema.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTEÚDO PARA ADMINISTRADOR (root) -->
+            <div {{SHOW_ADMIN_CONTENT}}>
+                <!-- Links de Acesso Rápido para Admin -->
+                <div class="info-card">
+                    <h2>Acesso Rápido - Administrador</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="/config_unidade" style="display: block; padding: 15px; background: #F9F9F9; border-left: 3px solid #4DB8AC; border-radius: 4px; text-decoration: none; color: #2C4A1E; font-weight: 600;">
+                            Configuração de Dispositivo
+                        </a>
+                        <a href="/mqtt_config" style="display: block; padding: 15px; background: #F9F9F9; border-left: 3px solid #4DB8AC; border-radius: 4px; text-decoration: none; color: #2C4A1E; font-weight: 600;">
+                            Configurar MQTT/TLS
+                        </a>
+                        <a href="/admin" style="display: block; padding: 15px; background: #F9F9F9; border-left: 3px solid #C8D93D; border-radius: 4px; text-decoration: none; color: #2C4A1E; font-weight: 600;">
+                            Gerenciamento Avançado
+                        </a>
+                        <a href="/info" style="display: block; padding: 15px; background: #F9F9F9; border-left: 3px solid #4DB8AC; border-radius: 4px; text-decoration: none; color: #2C4A1E; font-weight: 600;">
+                            Informações do Sistema
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Seção Completa dos Registradores Modbus - Apenas para Admin -->
+                <div class="info-card">
+                    <h2>Registradores Modbus - Painel Completo</h2>
+                    
+                    <form action="/modbus_registers_save" method="post">
+                        
+                        <!-- Registradores 1000 - Configuração RTU -->
+                        <details style="margin-bottom: 20px;">
+                            <summary style="cursor: pointer; font-weight: 600; color: #2C4A1E; padding: 10px; background: #F9F9F9; border-radius: 4px;">Configuração RTU (1000)</summary>
+                            <div class="info-grid" style="margin-top: 15px;">
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">1000 - Baudrate:</span>
+                                    <input type="number" name="reg1000_0" value="{{RTU_BAUDRATE}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">1001 - Slave Address:</span>
+                                    <input type="number" name="reg1000_1" value="{{RTU_SLAVE_ADDRESS}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">1002 - Parity:</span>
+                                    <select name="reg1000_2" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                        <option value="0" {{RTU_PARITY_0_SELECTED}}>0 - None</option>
+                                        <option value="1" {{RTU_PARITY_1_SELECTED}}>1 - Even</option>
+                                        <option value="2" {{RTU_PARITY_2_SELECTED}}>2 - Odd</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </details>
+
+                        <!-- Registradores 2000 - Dados (Somente Leitura) -->
+                        <details style="margin-bottom: 20px;">
+                            <summary style="cursor: pointer; font-weight: 600; color: #2C4A1E; padding: 10px; background: #F9F9F9; border-radius: 4px;">Dados do Sistema (2000) - Somente Leitura</summary>
+                            <div class="info-grid" style="margin-top: 15px;">
+                                <div class="info-item">
+                                    <span class="info-label">2000 - Valor de Dados:</span>
+                                    <span class="info-value">{{REG2000_0}}</span>
+                                </div>
+                            </div>
+                        </details>
+
+                        <!-- Registradores 4000 - Lambda/Heat -->
+                        <details style="margin-bottom: 20px;">
+                            <summary style="cursor: pointer; font-weight: 600; color: #2C4A1E; padding: 10px; background: #F9F9F9; border-radius: 4px;">Controle Lambda/Heat (4000)</summary>
+                            <div class="info-grid" style="margin-top: 15px;">
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">4000 - Lambda Value:</span>
+                                    <input type="number" name="reg4000_0" value="{{REG4000_0}}" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">4001 - Lambda Ref:</span>
+                                    <input type="number" name="reg4000_1" value="{{REG4000_1}}" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">4002 - Heat Value:</span>
+                                    <input type="number" name="reg4000_2" value="{{REG4000_2}}" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">4003 - Heat Ref:</span>
+                                    <input type="number" name="reg4000_3" value="{{REG4000_3}}" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">4004 - Output MB:</span>
+                                    <input type="number" name="reg4000_4" value="{{REG4000_4}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">4005 - Probe Damaged:</span>
+                                    <select name="reg4000_5" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                        <option value="0" {{REG4000_5_0_SELECTED}}>0 - Normal</option>
+                                        <option value="1" {{REG4000_5_1_SELECTED}}>1 - Danificada</option>
+                                    </select>
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">4006 - Probe Temp Out:</span>
+                                    <select name="reg4000_6" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                        <option value="0" {{REG4000_6_0_SELECTED}}>0 - Normal</option>
+                                        <option value="1" {{REG4000_6_1_SELECTED}}>1 - Fora da Faixa</option>
+                                    </select>
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">4007 - Compressor Fail:</span>
+                                    <select name="reg4000_7" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                        <option value="0" {{REG4000_7_0_SELECTED}}>0 - Normal</option>
+                                        <option value="1" {{REG4000_7_1_SELECTED}}>1 - Falha</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </details>
+
+                        <!-- Registradores 6000 - Configuração DAC -->
+                        <details style="margin-bottom: 20px;">
+                            <summary style="cursor: pointer; font-weight: 600; color: #2C4A1E; padding: 10px; background: #F9F9F9; border-radius: 4px;">Configuração DAC (6000)</summary>
+                            <div class="info-grid" style="margin-top: 15px;">
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">6000 - Max DAC0:</span>
+                                    <input type="number" name="reg6000_0" value="{{REG6000_0}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">6001 - Força Valor DAC:</span>
+                                    <input type="number" name="reg6000_1" value="{{REG6000_1}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">6002 - Reservado:</span>
+                                    <input type="number" name="reg6000_2" value="{{REG6000_2}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">6003 - DAC Gain0:</span>
+                                    <input type="number" name="reg6000_3" value="{{REG6000_3}}" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">6004 - DAC Offset0:</span>
+                                    <input type="number" name="reg6000_4" value="{{REG6000_4}}" step="0.01" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                            </div>
+                        </details>
+
+                        <!-- Registradores 9000 - Especificações da Unidade -->
+                        <details style="margin-bottom: 20px;">
+                            <summary style="cursor: pointer; font-weight: 600; color: #2C4A1E; padding: 10px; background: #F9F9F9; border-radius: 4px;">Especificações da Unidade (9000)</summary>
+                            <div class="info-grid" style="margin-top: 15px;">
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9000 - Valor Zero:</span>
+                                    <input type="number" name="reg9000_0" value="{{REG9000_0}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9001 - Valor Um:</span>
+                                    <input type="number" name="reg9000_1" value="{{REG9000_1}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9002 - Firm Ver Hi:</span>
+                                    <input type="number" name="reg9000_2" value="{{REG9000_2}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9003 - Firm Ver Lo:</span>
+                                    <input type="number" name="reg9000_3" value="{{REG9000_3}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9004 - Valor Quatro:</span>
+                                    <input type="number" name="reg9000_4" value="{{REG9000_4}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9005 - Valor Cinco:</span>
+                                    <input type="number" name="reg9000_5" value="{{REG9000_5}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9006 - Lot Num 0:</span>
+                                    <input type="number" name="reg9000_6" value="{{REG9000_6}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9007 - Lot Num 1:</span>
+                                    <input type="number" name="reg9000_7" value="{{REG9000_7}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9008 - Lot Num 2:</span>
+                                    <input type="number" name="reg9000_8" value="{{REG9000_8}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9009 - Lot Num 3:</span>
+                                    <input type="number" name="reg9000_9" value="{{REG9000_9}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9010 - Lot Num 4:</span>
+                                    <input type="number" name="reg9000_10" value="{{REG9000_10}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9011 - Lot Num 5:</span>
+                                    <input type="number" name="reg9000_11" value="{{REG9000_11}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9012 - Waf Num:</span>
+                                    <input type="number" name="reg9000_12" value="{{REG9000_12}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9013 - Coord X0:</span>
+                                    <input type="number" name="reg9000_13" value="{{REG9000_13}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9014 - Coord X1:</span>
+                                    <input type="number" name="reg9000_14" value="{{REG9000_14}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9015 - Coord Y0:</span>
+                                    <input type="number" name="reg9000_15" value="{{REG9000_15}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9016 - Coord Y1:</span>
+                                    <input type="number" name="reg9000_16" value="{{REG9000_16}}" min="0" max="65535" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9017 - Valor 17:</span>
+                                    <input type="number" name="reg9000_17" value="{{REG9000_17}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9018 - Valor 18:</span>
+                                    <input type="number" name="reg9000_18" value="{{REG9000_18}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                                <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                                    <span class="info-label">9019 - Valor 19:</span>
+                                    <input type="number" name="reg9000_19" value="{{REG9000_19}}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                                </div>
+                            </div>
+                        </details>
+
+                        <!-- Botões de Ação -->
+                        <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 2px solid #C8D93D;">
+                            <button type="submit" style="margin: 5px; padding: 12px 24px; font-size: 15px;">Salvar Todas as Alterações</button>
+                            <button type="button" onclick="location.reload()" style="margin: 5px; background: #999; padding: 12px 24px; font-size: 15px;">Recarregar Valores</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <!-- Fim content-area -->
+    </div>
+    <!-- Fim main-container -->
+    
+    <script src="/js/scripts.js"></script>
+    <script src="/js/config_manager.js"></script>
+</body>
+</html>

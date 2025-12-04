@@ -2,7 +2,10 @@
 #define MODBUS_PARAMS_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "modbus_map.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 
 typedef struct {
     uint8_t discrete_input0;
@@ -62,5 +65,38 @@ extern uint16_t reg8000[REG_8000_SIZE];
 extern uint16_t reg9000[REG_UNITSPECS_SIZE];
 extern coil_reg_params_t coil_reg_params;
 extern input_reg_params_t input_reg_params;
+
+// ================= CONTROLE DE HABILITAÇÃO RTU =================
+// Variável global que controla se Modbus RTU está habilitado
+extern bool modbus_rtu_enabled;
+
+// ================= MUTEX DE PROTEÇÃO DOS REGISTRADORES =================
+// Mutex para acesso thread-safe aos registradores Modbus compartilhados
+// entre RTU e TCP
+extern SemaphoreHandle_t modbus_registers_mutex;
+
+/**
+ * @brief Inicializa o mutex de proteção dos registradores Modbus
+ * @note DEVE ser chamado antes de criar as tasks RTU/TCP
+ * @return true se sucesso, false se falha
+ */
+bool modbus_mutex_init(void);
+
+/**
+ * @brief Bloqueia (lock) o acesso aos registradores Modbus
+ * @param timeout_ms Timeout em milissegundos (use portMAX_DELAY para espera infinita)
+ * @return true se conseguiu o lock, false se timeout
+ */
+bool modbus_lock_registers(uint32_t timeout_ms);
+
+/**
+ * @brief Libera (unlock) o acesso aos registradores Modbus
+ */
+void modbus_unlock_registers(void);
+
+/**
+ * @brief Destrói o mutex (usado no shutdown do sistema)
+ */
+void modbus_mutex_destroy(void);
 
 #endif // MODBUS_PARAMS_H

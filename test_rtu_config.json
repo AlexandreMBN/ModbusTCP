@@ -1,0 +1,8 @@
+{
+  "baudrate": 9600,
+  "slave_address": 1,
+  "parity": 0,
+  "databits": 8,
+  "stopbits": 1,
+  "timeout": 1000
+}

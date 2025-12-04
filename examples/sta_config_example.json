@@ -1,0 +1,8 @@
+{
+  "ssid": "MinhaRedeWiFi",
+  "password": "minha_senha_wifi",
+  "dhcp_enabled": true,
+  "static_ip": "",
+  "gateway": "",
+  "subnet": "255.255.255.0"
+}

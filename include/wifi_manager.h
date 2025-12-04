@@ -63,4 +63,9 @@ uint32_t wifi_last_scan_duration_ms(void);
 // the task to monitor was created, or error if the task couldn't be started.
 esp_err_t wifi_switch_to_sta_on_successful_connect(uint32_t timeout_ms);
 
+// Controle global para habilitar/desabilitar STA
+// Deve ser definido ANTES de chamar start_wifi_ap()
+void wifi_set_sta_enabled(bool enabled);
+bool wifi_get_sta_enabled(void);
+
 #endif // WIFI_MANAGER_H

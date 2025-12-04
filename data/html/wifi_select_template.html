@@ -7,35 +7,39 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <div>
-        <h1>📶 Escolha sua rede Wi-Fi</h1>
-        <form action="/wifi_save" method="post">
-            <ul id="wifi-networks">
+    <div class="brand">
+        <div class="brand-main">
+            <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+            <h2 class="brand-company">Infitech - Automação</h2>
+        </div>
+        <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+    </div>
+
+    <div class="config-card" style="margin-top: 10px; padding: 15px;">
+        <h1 style="margin-top:0;">Selecionar WiFi</h1>
+        <form action="/wifi_save" method="post" style="margin:0;">
+            <ul id="wifi-networks" class="info-list" style="margin-bottom: 12px;">
                 {{WIFI_LIST}}
             </ul>
-            
-            <div>
-                <label>SSID:</label>
-                <input type="text" name="ssid" id="ssid_input" value="{{SELECTED_SSID}}" required>
-                
-                <label>Senha:</label>
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <input type="password" name="password" id="password_input" required>
-                    <button type="button" id="password_input_toggle" class="btn btn-tertiary" onclick="togglePasswordVisibility('password_input','password_input_toggle')">Mostrar</button>
-                <div>
-                    <div class="brand">
-                        <div class="brand-main">
-                            <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
-                            <h2 class="brand-company">Infitech - Automação</h2>
-                        </div>
-                        <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+
+            <div class="info-grid" style="margin-bottom: 12px;">
+                <div class="info-item">
+                    <label class="info-label" for="ssid_input">SSID:</label>
+                    <input class="config-input" type="text" name="ssid" id="ssid_input" value="{{SELECTED_SSID}}" required>
+                </div>
+                <div class="info-item">
+                    <label class="info-label" for="password_input">Senha:</label>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <input class="config-input" type="password" name="password" id="password_input" required>
+                        <button type="button" id="password_input_toggle" class="btn-config btn-tertiary" onclick="togglePasswordVisibility('password_input','password_input_toggle')">Mostrar</button>
                     </div>
-                    <h1>📶 Selecionar WiFi (Template)</h1>
-        
-                    <div>
-                <button type="submit">💾 Salvar e conectar</button>
-                <a href="/wifi_scan">🔄 Scan</a>
-                <a href="/admin">⬅️ Voltar</a>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:8px;">
+                <button class="btn-config btn-primary" type="submit">Salvar e conectar</button>
+                <a class="btn-config btn-secondary" href="/wifi_scan">Scan</a>
+                <a class="btn-config btn-secondary" href="/admin">Voltar</a>
             </div>
         </form>
     </div>

@@ -4,9 +4,21 @@
 #include "modbus_config.h"
 #include "modbus_params.h"
 
+// Redefine com valores do Kconfig se disponíveis
+#ifdef CONFIG_MB_UART_PORT_NUM
+#undef MB_PORT_NUM
 #define MB_PORT_NUM     (CONFIG_MB_UART_PORT_NUM)   // Number of UART port used for Modbus connection
+#endif
+
+#ifdef CONFIG_MB_SLAVE_ADDR
+#undef MB_SLAVE_ADDR
 #define MB_SLAVE_ADDR   (CONFIG_MB_SLAVE_ADDR)      // The address of device in Modbus network
+#endif
+
+#ifdef CONFIG_MB_UART_BAUD_RATE
+#undef MB_DEV_SPEED
 #define MB_DEV_SPEED    (CONFIG_MB_UART_BAUD_RATE)  // The communication speed of the UART
+#endif
 
 // Note: Some pins on target chip cannot be assigned for UART communication.
 // Please refer to documentation for selected board and target to configure pins using Kconfig.

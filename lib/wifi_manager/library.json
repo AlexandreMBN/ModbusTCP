@@ -1,0 +1,53 @@
+{
+  "name": "WiFi Manager",
+  "version": "1.0.0",
+  "description": "Comprehensive WiFi management library for ESP32 with AP/STA dual mode, automatic fallback, network scanning, and configuration management",
+  "keywords": [
+    "ESP32",
+    "WiFi",
+    "AP",
+    "STA", 
+    "Access Point",
+    "Station",
+    "Network Scanning",
+    "DHCP",
+    "Static IP",
+    "Configuration Management",
+    "Dual Mode",
+    "Fallback"
+  ],
+  "authors": [
+    {
+      "name": "ESP32 Development Team",
+      "email": "developer@esp32.com"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/esp32/wifi-manager",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esp32/wifi-manager.git"
+  },
+  "frameworks": [
+    "espidf"
+  ],
+  "platforms": [
+    "espressif32"
+  ],
+  "dependencies": {
+    "Config Manager": ">=1.0.0",
+    "AP Manager": ">=1.0.0"
+  },
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src"
+  },
+  "export": {
+    "include": [
+      "include/*",
+      "src/*",
+      "examples/*",
+      "README.md"
+    ]
+  }
+}

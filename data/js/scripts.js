@@ -523,22 +523,27 @@ function setupEventListeners() {
     // Formulário de login
     const loginForm = document.querySelector('#login-form');
     if (loginForm) {
-        // Prevent the form from being submitted by pressing Enter in any field
+        // Função para submeter o formulário
+        function submitLoginForm() {
+            if (validateForm(loginForm)) {
+                // Use the form's submit to follow the action/method
+                loginForm.submit();
+            }
+        }
+        
+        // Allow Enter key to submit the form
         loginForm.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                // prevent default Enter behavior inside the form
                 e.preventDefault();
+                submitLoginForm();
             }
         });
 
-        // Submit only when the explicit login button is clicked
+        // Submit when the explicit login button is clicked
         const loginBtn = document.querySelector('#login-btn');
         if (loginBtn) {
             loginBtn.addEventListener('click', function() {
-                if (validateForm(loginForm)) {
-                    // Use the form's submit to follow the action/method
-                    loginForm.submit();
-                }
+                submitLoginForm();
             });
         }
     }

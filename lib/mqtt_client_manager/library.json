@@ -1,0 +1,55 @@
+{
+  "name": "MQTT Client Manager",
+  "version": "1.0.0",
+  "description": "Comprehensive MQTT client library for ESP32 with advanced connection management, topic routing, SSL/TLS support, and configuration integration",
+  "keywords": [
+    "ESP32",
+    "MQTT",
+    "Client",
+    "Broker",
+    "Publish",
+    "Subscribe", 
+    "QoS",
+    "SSL",
+    "TLS",
+    "Topics",
+    "IoT",
+    "Messaging",
+    "Reconnection",
+    "Configuration"
+  ],
+  "authors": [
+    {
+      "name": "ESP32 Development Team",
+      "email": "developer@esp32.com"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/esp32/mqtt-client-manager",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esp32/mqtt-client-manager.git"
+  },
+  "frameworks": [
+    "espidf"
+  ],
+  "platforms": [
+    "espressif32"
+  ],
+  "dependencies": {
+    "Config Manager": ">=1.0.0",
+    "WiFi Manager": ">=1.0.0"
+  },
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src"
+  },
+  "export": {
+    "include": [
+      "include/*",
+      "src/*",
+      "examples/*",
+      "README.md"
+    ]
+  }
+}

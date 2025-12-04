@@ -7,34 +7,47 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <div>
-        <h1>📶 Escolha sua rede Wi-Fi</h1>
-        <h3>{{STATUS_MESSAGE}}</h3>
-        
-        <form action="/wifi_save" method="post">
-            <div>
-                <label>SSID:</label>
-                <input type="text" name="ssid" placeholder="Nome da rede WiFi" required>
-                
-                <label>Senha:</label>
-                <input type="password" name="password" placeholder="Senha da rede" required>
-            <div>
-                <div class="brand">
-                    <div class="brand-main">
-                        <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
-                        <h2 class="brand-company">Infitech - Automação</h2>
-                    </div>
-                    <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+    <div class="brand">
+        <div class="brand-main">
+            <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
+            <h2 class="brand-company">Infitech - Automação</h2>
+        </div>
+        <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+    </div>
+
+    <div class="config-card" style="margin-top: 10px; padding: 15px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+            <h1 style="margin:0;">✍️ Configuração Manual Wi-Fi</h1>
+            <div style="display:flex; gap:8px;">
+                <a class="btn-config btn-secondary" href="/wifi_scan">🔄 Escanear redes</a>
+                <a class="btn-config btn-secondary" href="/admin">⬅️ Voltar</a>
+            </div>
+        </div>
+
+        <p style="margin:8px 0; color:#6c757d;">{{STATUS_MESSAGE}}</p>
+
+        <form action="/wifi_save" method="post" style="margin-top: 8px;">
+            <div class="info-grid" style="margin-bottom: 12px;">
+                <div class="info-item">
+                    <label class="info-label" for="ssid_input">SSID:</label>
+                    <input class="config-input" type="text" name="ssid" id="ssid_input" placeholder="Nome da rede Wi-Fi" required>
                 </div>
-                <h1>✍️ Configuração Manual WiFi</h1>
-        
-                <div>
-                <a href="/wifi_scan">🔄 Escanear redes</a>
-                <a href="/admin">⬅️ Voltar</a>
+                <div class="info-item">
+                    <label class="info-label" for="password_input">Senha:</label>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input class="config-input" type="password" name="password" id="password_input" placeholder="Senha da rede" required>
+                        <button type="button" id="password_input_toggle" class="btn-config btn-tertiary" onclick="togglePasswordVisibility('password_input','password_input_toggle')">Mostrar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:8px;">
+                <button class="btn-config btn-primary" type="submit">Salvar e Conectar</button>
+                <a class="btn-config btn-secondary" href="/wifi">Configuração Wi-Fi</a>
             </div>
         </form>
     </div>
-    
+
     <script src="/js/scripts.js"></script>
 </body>
 </html>

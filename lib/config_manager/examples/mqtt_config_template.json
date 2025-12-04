@@ -1,0 +1,60 @@
+{
+  "_comment": "Configuração cliente MQTT - Comunicação IoT completa",
+  "broker_url": "mqtt://192.168.1.100",
+  "broker_host": "192.168.1.100",
+  "port": 1883,
+  "client_id": "esp32_device_001",
+  "username": "mqtt_user",
+  "password": "mqtt_password",
+  "enabled": true,
+  "qos": 1,
+  "retain": false,
+  "keep_alive": 60,
+  "clean_session": true,
+  "will_topic": "devices/esp32_device_001/status",
+  "will_message": "offline",
+  "will_qos": 1,
+  "will_retain": true,
+  "tls_enabled": false,
+  "ca_path": "/spiffs/certs/ca.pem",
+  "cert_path": "/spiffs/certs/client.pem",
+  "key_path": "/spiffs/certs/client.key",
+  "verify_peer": true,
+  "publish_interval_ms": 10000,
+  "reconnect_timeout_ms": 5000,
+  "max_reconnect_attempts": 10,
+  "topics": {
+    "subscribe": [
+      {
+        "topic": "devices/esp32_device_001/commands",
+        "qos": 1
+      },
+      {
+        "topic": "system/broadcast",
+        "qos": 0
+      }
+    ],
+    "publish": [
+      {
+        "topic": "sensors/temperature",
+        "qos": 1,
+        "retain": false
+      },
+      {
+        "topic": "sensors/humidity", 
+        "qos": 1,
+        "retain": false
+      }
+    ]
+  },
+  "buffer_size": 1024,
+  "task_stack_size": 4096,
+  "task_priority": 5,
+  "description": "Configuração completa do cliente MQTT para IoT",
+  "metadata": {
+    "created_by": "config_manager_library",
+    "version": "1.0.0",
+    "last_modified": "2024-11-10T10:00:00Z",
+    "environment": "production"
+  }
+}
