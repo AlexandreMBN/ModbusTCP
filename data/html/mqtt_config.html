@@ -7,99 +7,7 @@
     <link rel="stylesheet" href="/css/styles.css">
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
-
-        .config-device-container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .config-device-title {
-            margin: 0;
-            color: #333;
-        }
-
-        .btn-voltar {
-            background: #ccc;
-            padding: 8px 12px;
-            text-decoration: none;
-            border-radius: 6px;
-            color: #000;
-        }
-
-        .brand {
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .brand-logo {
-            width: 100px;
-            border-radius: 8px;
-        }
-
-        .config-card {
-            margin-top: 25px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background: #fafafa;
-        }
-
-        .config-card h2 {
-            margin-top: 0;
-            color: #333;
-        }
-
-        .config-form-group {
-            margin: 10px 0;
-        }
-
-        .config-label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .config-input {
-            width: 100%;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .btn-config, .test-connection {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        .btn-config:hover, .test-connection:hover {
-            background: #0056b3;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-        }
-
+        /* Ajustes específicos desta página mantendo o layout padrão */
         .mqtt-status {
             padding: 10px;
             border-radius: 5px;
@@ -145,9 +53,7 @@
             font-size: 14px;
         }
 
-        .hidden {
-            display: none;
-        }
+        .hidden { display: none; }
 
         .port-auto {
             color: #6c757d;
@@ -158,24 +64,52 @@
 </head>
 
 <body>
-    <div class="config-device-container">
-        <div class="header">
-            <h1 class="config-device-title">Configuração MQTT</h1>
-            <a class="btn-voltar" href="/admin">Voltar</a>
+    <!-- Cabeçalho Turquesa -->
+    <div class="header-bar">
+        <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech" class="header-logo">
+        <div class="header-title">
+            <h1>Medidor de Combustão</h1>
+            <p>Modelo MCT-1</p>
+        </div>
+    </div>
+
+    <!-- Container Principal: Sidebar + Conteúdo -->
+    <div class="main-container">
+        <!-- Menu Lateral Amarelo -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Status</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="/info">Informações do Dispositivo</a></li>
+                    <li><a href="/admin">Gerenciamento de Configurações</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Configurações</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="/config_unidade">Configuração de Dispositivo</a></li>
+                    <li><a href="/mqtt_config" class="active">Configuração MQTT/TLS</a></li>
+                    <li><a href="/modbus">Registradores Modbus</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <ul class="sidebar-menu">
+                    <li><a href="/logout">Logout</a></li>
+                </ul>
+            </div>
         </div>
 
-        <div class="brand">
-            <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
-            <h2>Infitech - Automação</h2>
-            <div class="brand-program">Programa: <strong>MCT-01</strong></div>
-        </div>
+        <div class="content-area">
+            <h2 class="page-title">Configuração MQTT</h2>
 
         <!-- Status -->
         <div id="mqtt-status" class="mqtt-status status-disconnected">Status: Desconectado</div>
 
         <!-- Configuração Básica -->
-        <div class="config-card">
-            <h2>Configuração do Broker</h2>
+        <details class="config-card" style="cursor: pointer;">
+            <summary style="font-size: 18px; font-weight: 600; color: #2C4A1E; padding: 10px 0; margin-bottom: 15px;">
+                Configuração do Broker
+            </summary>
             <div class="config-form-group">
                 <label class="config-label">Broker URL:</label>
                 <input class="config-input" id="broker_url" name="broker_url" value="{{MQTT_BROKER_URL}}" placeholder="broker.hivemq.com">
@@ -190,11 +124,13 @@
                 <label class="config-label">Client ID:</label>
                 <input class="config-input" id="client_id" name="client_id" value="{{MQTT_CLIENT_ID}}" placeholder="ESP32_SondaLambda">
             </div>
-        </div>
+        </details>
 
         <!-- TLS -->
-        <div class="config-card">
-            <h2>Segurança TLS/SSL</h2>
+        <details class="config-card" style="cursor: pointer;">
+            <summary style="font-size: 18px; font-weight: 600; color: #2C4A1E; padding: 10px 0; margin-bottom: 15px;">
+                Segurança TLS/SSL
+            </summary>
             <div class="config-form-group">
                 <label><input type="checkbox" id="tls_enabled" name="tls_enabled" {{MQTT_TLS_CHECKED}}> Habilitar TLS/SSL</label>
                 <small>Ativa criptografia para proteger os dados transmitidos</small>
@@ -216,11 +152,13 @@
                     <div id="cert-status" class="cert-info hidden"></div>
                 </div>
             </div>
-        </div>
+        </details>
 
         <!-- Autenticação -->
-        <div class="config-card">
-            <h2>Autenticação</h2>
+        <details class="config-card" style="cursor: pointer;">
+            <summary style="font-size: 18px; font-weight: 600; color: #2C4A1E; padding: 10px 0; margin-bottom: 15px;">
+                Autenticação
+            </summary>
             <div class="config-form-group">
                 <label class="config-label">Usuário:</label>
                 <input class="config-input" id="username" name="username" value="{{MQTT_USERNAME}}">
@@ -229,11 +167,13 @@
                 <label class="config-label">Senha:</label>
                 <input class="config-input" type="password" id="password" name="password" value="{{MQTT_PASSWORD}}">
             </div>
-        </div>
+        </details>
 
         <!-- Avançado -->
-        <div class="config-card">
-            <h2>Configurações Avançadas</h2>
+        <details class="config-card" style="cursor: pointer;">
+            <summary style="font-size: 18px; font-weight: 600; color: #2C4A1E; padding: 10px 0; margin-bottom: 15px;">
+                Configurações Avançadas
+            </summary>
             <div class="config-form-group">
                 <label class="config-label">QoS:</label>
                 <select class="config-input" id="qos" name="qos">
@@ -249,7 +189,7 @@
             <div class="config-form-group">
                 <label><input type="checkbox" id="retain" name="retain" {{MQTT_RETAIN_CHECKED}}> Reter Mensagens</label>
             </div>
-        </div>
+        </details>
 
         <!-- Botões -->
         <div class="config-card" style="text-align:center;">
@@ -265,6 +205,8 @@
                 Pronto para testar conexão...
             </div>
         </div>
+        </div> <!-- /content-area -->
+    </div> <!-- /main-container -->
     </div>
 
     <script>

@@ -6,19 +6,18 @@
     <title>Login - Medidor de Combustão</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
-    <div>
+<body class="login-page">
+    <div class="login-container">
         <div class="brand">
             <div class="brand-main">
                 <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
                 <h2 class="brand-company">Infitech - Automação</h2>
             </div>
-            
         </div>
 
         <h1>Login</h1>
         
-    <form id="login-form" action="/do_login" method="post">
+        <form id="login-form" action="/do_login" method="post">
             <label>Usuário:</label>
             <input type="text" name="user" placeholder="Digite seu usuário" required>
             
@@ -27,7 +26,6 @@
             
             <div>
                 <button type="button" id="login-btn">Entrar</button>
-                <!-- <a href="/">⬅️ Voltar</a> -->
             </div>
         </form>
     </div>

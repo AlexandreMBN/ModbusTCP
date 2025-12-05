@@ -114,25 +114,47 @@
             pointer-events: none; /* Desabilita cliques na seção inteira */
         }
     </style>
-</head>
-<body>
-    <div>
-        <div>
-            <a href="/admin">Voltar</a>
-        <div>
-            <div class="brand">
-                <div class="brand-main">
-                    <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech - Automação" class="brand-logo">
-                    <h2 class="brand-company">Infitech - Automação</h2>
-                </div>
-                <div class="brand-program">Programa: <strong>MCT-01</strong></div>
+    </head>
+    <body>
+        <!-- Cabeçalho e navegação padrão -->
+        <div class="header-bar">
+            <img src="https://infitech.com.br/images/logo.jpg" alt="Infitech" class="header-logo">
+            <div class="header-title">
+                <h1>Medidor de Combustão</h1>
+                <p>Modelo MCT-1</p>
             </div>
-            
-            
-            <h1>Configuração do Dispositivo</h1>
-        
-            <div>
-            <div class="config-card">
+        </div>
+
+        <div class="main-container">
+            <!-- Menu Lateral -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-section-title">Status</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="/info">Informações do Dispositivo</a></li>
+                        <li><a href="/admin">Gerenciamento de Configurações</a></li>
+                    </ul>
+                </div>
+                <div class="sidebar-section">
+                    <h3 class="sidebar-section-title">Configurações</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="/config_unidade" class="active">Configuração de Dispositivo</a></li>
+                        <li><a href="/mqtt_config">Configuração MQTT/TLS</a></li>
+                        <li><a href="/modbus">Registradores Modbus</a></li>
+                    </ul>
+                </div>
+                <div class="sidebar-section">
+                    <ul class="sidebar-menu">
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Área de conteúdo principal -->
+            <div class="content-area">
+                <h2 class="page-title">Configuração do Dispositivo</h2>
+
+                <div class="config-card">
                 <h2>Modo de Operação</h2>
                 <p class="mode-description">Selecione o modo de funcionamento do dispositivo:</p>
                 
@@ -182,6 +204,11 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="form-actions" style="margin: 12px 0 24px 0;">
+                <button class="btn-config btn-warning" type="button" onclick="doFactoryReset()">Reset de Fábrica</button>
+            </div>
+
         </div>
         
         <div class="config-container">
@@ -489,12 +516,9 @@
                 </div>
             </div>
         </div>
-        <div>
-            <button onclick="doFactoryReset()">
-                Reset de Fábrica
-            </button>
-        </div>
-    </div>
+
+        </div> <!-- /content-area -->
+    </div> <!-- /main-container -->
     
     <script src="/js/scripts.js"></script>
     <script>

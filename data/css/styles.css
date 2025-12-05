@@ -122,7 +122,7 @@ body {
 
 .sidebar-menu a.active {
     background: rgba(255,255,255,0.35);
-    font-weight: bold;
+    font-weight: 500;
 }
 
 /* ========== ÁREA DE CONTEÚDO ========== */
